@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playdate — Sign Up</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: white;
+            padding-top: 0;
+        }
+
+        .content {
+            display: flex;
+            justify-content: center;
+            padding: 80px 20px 60px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .card h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 32px;
+            color: #000;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .card .subtitle {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 16px;
+            color: #00B2A9;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 6px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 11px 16px;
+            border-radius: 12px;
+            border: 1.5px solid #ddd;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+        }
+
+        .field input:focus {
+            border-color: #00B2A9;
+        }
+
+        .sports-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .sports-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .sport-tag {
+            padding: 7px 16px;
+            border-radius: 20px;
+            border: 1.5px solid #ddd;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: white;
+        }
+
+        .sport-tag.selected {
+            background: #F7567C;
+            color: white;
+            border-color: #F7567C;
+        }
+
+        .add-sport {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .add-sport-btn {
+            padding: 7px 16px;
+            border-radius: 20px;
+            border: 1.5px dashed #ccc;
+            font-size: 13px;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: white;
+        }
+
+        .add-sport-btn:hover {
+            border-color: #F7567C;
+            color: #F7567C;
+        }
+
+        .add-sport-input {
+            display: none;
+            padding: 7px 14px;
+            border-radius: 20px;
+            border: 1.5px solid #00B2A9;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            outline: none;
+            width: 140px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: #F7567C;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 30px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background-color: #e04570;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .login-link a {
+            color: #F7567C;
+            font-weight: 600;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <span>Playdate</span>
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="signup.html">Sign Up</a>
+    </nav>
+
+    <div class="content">
+        <div class="card">
+            <h1>Join Playdate</h1>
+            <p class="subtitle">Find athletes. Schedule games. Just play.</p>
+
+            <div class="field">
+                <label>Full name</label>
+                <input type="text" placeholder="Jane Smith">
+            </div>
+            <div class="field">
+                <label>Email</label>
+                <input type="email" placeholder="jane@email.com">
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input type="password" placeholder="••••••••">
+            </div>
+
+            <span class="sports-label">Sports of interest</span>
+            <div class="sports-grid" id="sports-grid">
+                <button class="sport-tag" onclick="toggleSport(this)">Tennis</button>
+                <button class="sport-tag" onclick="toggleSport(this)">Basketball</button>
+                <button class="sport-tag" onclick="toggleSport(this)">Soccer</button>
+                <button class="sport-tag" onclick="toggleSport(this)">Running</button>
+                <button class="sport-tag" onclick="toggleSport(this)">Volleyball</button>
+                <button class="sport-tag" onclick="toggleSport(this)">Cycling</button>
+                <button class="sport-tag" onclick="toggleSport(this)">Baseball</button>
+                <button class="sport-tag" onclick="toggleSport(this)">Pickleball</button>
+                <button class="sport-tag" onclick="toggleSport(this)">Golf</button>
+            </div>
+
+            <div class="add-sport">
+                <button class="add-sport-btn" onclick="showAddSport()">+ Add sport</button>
+                <input class="add-sport-input" id="add-sport-input" type="text" placeholder="e.g. Rowing" onkeydown="addCustomSport(event)">
+            </div>
+
+            <button class="submit-btn">Create Account ↗</button>
+            <p class="login-link">Already have an account? <a href="#">Log in</a></p>
+        </div>
+    </div>
+
+    <script>
+        function toggleSport(el) {
+            el.classList.toggle('selected');
+        }
+
+        function showAddSport() {
+            const input = document.getElementById('add-sport-input');
+            input.style.display = 'block';
+            input.focus();
+        }
+
+        function addCustomSport(e) {
+            if (e.key === 'Enter') {
+                const input = document.getElementById('add-sport-input');
+                const value = input.value.trim();
+                if (value) {
+                    const tag = document.createElement('button');
+                    tag.className = 'sport-tag selected';
+                    tag.textContent = value;
+                    tag.onclick = function() { toggleSport(this); };
+                    document.getElementById('sports-grid').appendChild(tag);
+                    input.value = '';
+                    input.style.display = 'none';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

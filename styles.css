@@ -1,15 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Fraunces:wght@600&family=Plus+Jakarta+Sans:wght@600&display=swap');
 
 body {
     background: repeating-linear-gradient(
         180deg,
-        #f0f0f0 0px,
-        #f0f0f0 150px,
-        #e0e0e0 150px,
-        #e0e0e0 300px
+        #fdf8f2 0px,
+        #fdf8f2 150px,
+        #f5ede0 150px,
+        #f5ede0 300px
     );
     color: black;
-    font-family: 'Nunito', sans-serif;
+    font-family: sans-serif;
     text-align: center;
     padding-top: 100px;
 }
@@ -26,6 +26,9 @@ p {
 }
 
 .tagline {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 28px;
     color: white;
     background-color: #00B2A9;
     padding: 10px 25px;
@@ -41,7 +44,14 @@ button {
     border: none;
     padding: 15px 40px;
     font-size: 18px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
     border-radius: 30px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #e04570;
     cursor: pointer;
 }
 
@@ -58,16 +68,26 @@ nav {
 }
 
 nav span {
-    font-weight: bold;
+    font-family: 'Pacifico', cursive;
+    font-weight: 400;
     font-size: 20px;
     color: black;
     margin-right: auto;
 }
 
 nav a {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
     color: black;
     text-decoration: none;
-    font-size: 16px;
+    font-size: 15px;
+    background: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+}
+
+nav a:hover {
+    background: #ffe0e8;
 }
 
 .features {
