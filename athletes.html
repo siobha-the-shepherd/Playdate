@@ -45,6 +45,18 @@
       cursor: pointer;
       width: 100%;
     }
+
+    @media (max-width: 768px) {
+      #map { height: calc(100vh - 160px); }
+      .filters {
+        padding: 8px 12px;
+        gap: 6px;
+      }
+      .filters select {
+        font-size: 12px;
+        padding: 5px 10px;
+      }
+    }
   </style>
 </head>
 <body style="padding-top: 0; text-align: left;">
@@ -107,55 +119,4 @@
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '© OpenStreetMap contributors © CARTO'
-    }).addTo(map);
-
-    let markers = [];
-
-    function makeIcon(sport) {
-      const color = sportColors[sport] || "#F7567C";
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">
-        <path d="M16 0 C7.2 0 0 7.2 0 16 C0 28 16 42 16 42 C16 42 32 28 32 16 C32 7.2 24.8 0 16 0Z" fill="${color}" stroke="white" stroke-width="2"/>
-        <circle cx="16" cy="16" r="8" fill="white" opacity="0.3"/>
-      </svg>`;
-      return L.divIcon({
-        html: svg,
-        className: '',
-        iconSize: [32, 42],
-        iconAnchor: [16, 42],
-        popupAnchor: [0, -44]
-      });
-    }
-
-    function renderMarkers() {
-      markers.forEach(m => map.removeLayer(m));
-      markers = [];
-
-      const sport = document.getElementById('filter-sport').value;
-      const distance = parseFloat(document.getElementById('filter-distance').value);
-      const skill = document.getElementById('filter-skill').value;
-
-      athletes.filter(a =>
-        (!sport || a.sport === sport) &&
-        (!skill || a.skill === skill) &&
-        a.distance <= distance
-      ).forEach(a => {
-        const marker = L.marker([a.lat, a.lng], { icon: makeIcon(a.sport) })
-          .addTo(map)
-          .bindPopup(`
-            <div class="popup-name">${a.name}</div>
-            <div class="popup-sport">${a.sport}</div>
-            <div class="popup-meta">${a.skill} · ${a.distance} miles away</div>
-            <button class="popup-btn" onclick="window.location.href='signup.html'">Schedule a Playdate ↗</button>
-          `);
-        markers.push(marker);
-      });
-    }
-
-    map.whenReady(() => renderMarkers());
-
-    document.getElementById('filter-sport').addEventListener('change', renderMarkers);
-    document.getElementById('filter-distance').addEventListener('change', renderMarkers);
-    document.getElementById('filter-skill').addEventListener('change', renderMarkers);
-  </script>
-</body>
-</html>
+    }).addTo(m
