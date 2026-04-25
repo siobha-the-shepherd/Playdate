@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playdate — My Profile</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: #f0fafa;
+            padding-top: 55px;
+        }
+
+        .content {
+            display: flex;
+            justify-content: center;
+            padding: 50px 20px 60px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .photo-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #F7567C;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin-bottom: 12px;
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .name {
+            font-family: 'Pacifico', cursive;
+            font-size: 26px;
+            color: #000;
+            margin-bottom: 4px;
+        }
+
+        .location {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 24px 0;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 12px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .tag {
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .tag-sport {
+            background: #fff0f4;
+            color: #F7567C;
+            border: 1.5px solid #F7567C;
+        }
+
+        .tag-vibe {
+            background: #f0fafa;
+            color: #00B2A9;
+            border: 1.5px solid #00B2A9;
+        }
+
+        .bio {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .edit-btn {
+            width: 100%;
+            background: #F7567C;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 30px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .edit-btn:hover {
+            background: #e04570;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <span onclick="window.location.href='index.html'" style="cursor: pointer;">Playdate</span>
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="signup.html">Sign Up</a>
+        <a href="profile.html" class="profile-icon">👤</a>
+    </nav>
+
+    <div class="content">
+        <div class="card">
+            <div class="photo-area">
+                <div class="avatar">🏃</div>
+                <div class="name">Jeremy Hernandez</div>
+                <div class="location">📍 Miami, FL</div>
+            </div>
+
+            <hr class="divider">
+
+            <div class="section-title">Sports</div>
+            <div class="tags">
+                <span class="tag tag-sport">Tennis</span>
+                <span class="tag tag-sport">Running</span>
+                <span class="tag tag-sport">Pickleball</span>
+            </div>
+
+            <div class="section-title">Vibe</div>
+            <div class="tags">
+                <span class="tag tag-vibe">Friendly match</span>
+                <span class="tag tag-vibe">Just for laughs</span>
+            </div>
+
+            <div class="section-title">Bio</div>
+            <p class="bio">Miami-based athlete who loves early morning runs and weekend tennis. Always down for a friendly match — just bring your A game and good vibes.</p>
+
+            <button class="edit-btn">Edit Profile ↗</button>
+        </div>
+    </div>
+</body>
+</html>

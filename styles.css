@@ -90,6 +90,21 @@ nav a:hover {
     background: #ffe0e8;
 }
 
+nav a.profile-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+nav a.profile-icon:hover {
+    background: #ffe0e8;
+}
+
 .features {
     display: flex;
     justify-content: center;
