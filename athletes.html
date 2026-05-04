@@ -45,9 +45,19 @@
       cursor: pointer;
       width: 100%;
     }
+    #location-banner {
+      background: #fff8f9;
+      border-bottom: 1px solid #f7567c33;
+      padding: 10px 20px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px;
+      color: #888;
+      text-align: center;
+      display: none;
+    }
 
     @media (max-width: 768px) {
-      #map { height: calc(100vh - 160px); }
+      #map { height: calc(100vh - 180px); }
       .filters {
         padding: 8px 12px;
         gap: 6px;
@@ -68,6 +78,8 @@
     <a href="signup.html">Sign Up</a>
     <a href="signup.html" class="profile-icon">👤</a>
   </nav>
+
+  <div id="location-banner">📍 Using your location to find nearby athletes</div>
 
   <div class="filters" style="margin-top: 55px;">
     <label>Filter:</label>
@@ -97,14 +109,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const athletes = [
-      { name: "Maya R.",   sport: "Tennis",     skill: "Friendly match",  distance: 1.2, lat: 25.7650, lng: -80.1950 },
-      { name: "Jordan K.", sport: "Basketball", skill: "Bring it on",     distance: 0.8, lat: 25.7580, lng: -80.1880 },
-      { name: "Priya S.",  sport: "Running",    skill: "Just for laughs", distance: 3.1, lat: 25.7700, lng: -80.1970 },
-      { name: "Carlos M.", sport: "Soccer",     skill: "Friendly match",  distance: 4.5, lat: 25.7530, lng: -80.1840 },
-      { name: "Alex T.",   sport: "Tennis",     skill: "Bring it on",     distance: 2.3, lat: 25.7620, lng: -80.1920 },
-      { name: "Sam L.",    sport: "Basketball", skill: "Just for laughs", distance: 1.7, lat: 25.7680, lng: -80.1900 },
-    ];
+    const athletes = [];
 
     const sportColors = {
       Tennis: "#F7567C",
@@ -115,13 +120,28 @@
       Cycling: "#00B2A9"
     };
 
-    const map = L.map('map').setView([25.7617, -80.1918], 13);
+    let userLat = 25.7617;
+    let userLng = -80.1918;
+
+    const map = L.map('map').setView([userLat, userLng], 13);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '© OpenStreetMap contributors © CARTO'
     }).addTo(map);
 
     let markers = [];
+    let userMarker = null;
+
+    function getDistanceMiles(lat1, lng1, lat2, lng2) {
+      const R = 3958.8;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLng = (lng2 - lng1) * Math.PI / 180;
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
 
     function makeIcon(sport) {
       const color = sportColors[sport] || "#F7567C";
@@ -129,13 +149,14 @@
         <path d="M16 0 C7.2 0 0 7.2 0 16 C0 28 16 42 16 42 C16 42 32 28 32 16 C32 7.2 24.8 0 16 0Z" fill="${color}" stroke="white" stroke-width="2"/>
         <circle cx="16" cy="16" r="8" fill="white" opacity="0.3"/>
       </svg>`;
-      return L.divIcon({
-        html: svg,
-        className: '',
-        iconSize: [32, 42],
-        iconAnchor: [16, 42],
-        popupAnchor: [0, -44]
-      });
+      return L.divIcon({ html: svg, className: '', iconSize: [32, 42], iconAnchor: [16, 42], popupAnchor: [0, -44] });
+    }
+
+    function makeUserIcon() {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+        <circle cx="11" cy="11" r="9" fill="#4A90E2" stroke="white" stroke-width="3"/>
+      </svg>`;
+      return L.divIcon({ html: svg, className: '', iconSize: [22, 22], iconAnchor: [11, 11] });
     }
 
     function renderMarkers() {
@@ -143,27 +164,55 @@
       markers = [];
 
       const sport = document.getElementById('filter-sport').value;
-      const distance = parseFloat(document.getElementById('filter-distance').value);
+      const maxDistance = parseFloat(document.getElementById('filter-distance').value);
       const skill = document.getElementById('filter-skill').value;
 
-      athletes.filter(a =>
-        (!sport || a.sport === sport) &&
-        (!skill || a.skill === skill) &&
-        a.distance <= distance
-      ).forEach(a => {
-        const marker = L.marker([a.lat, a.lng], { icon: makeIcon(a.sport) })
-          .addTo(map)
-          .bindPopup(`
-            <div class="popup-name">${a.name}</div>
-            <div class="popup-sport">${a.sport}</div>
-            <div class="popup-meta">${a.skill} · ${a.distance} miles away</div>
-            <button class="popup-btn" onclick="window.location.href='signup.html'">Schedule a Playdate ↗</button>
-          `);
-        markers.push(marker);
+      athletes.forEach(a => {
+        const dist = getDistanceMiles(userLat, userLng, a.lat, a.lng);
+        if (
+          (!sport || a.sport === sport) &&
+          (!skill || a.skill === skill) &&
+          dist <= maxDistance
+        ) {
+          const marker = L.marker([a.lat, a.lng], { icon: makeIcon(a.sport) })
+            .addTo(map)
+            .bindPopup(`
+              <div class="popup-name">${a.name}</div>
+              <div class="popup-sport">${a.sport}</div>
+              <div class="popup-meta">${a.skill} · ${dist.toFixed(1)} miles away</div>
+              <button class="popup-btn" onclick="window.location.href='signup.html'">Schedule a Playdate ↗</button>
+            `);
+          markers.push(marker);
+        }
       });
     }
 
-    map.whenReady(() => renderMarkers());
+    function placeUserMarker() {
+      if (userMarker) map.removeLayer(userMarker);
+      userMarker = L.marker([userLat, userLng], { icon: makeUserIcon() })
+        .addTo(map)
+        .bindPopup("📍 You are here");
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          userLat = pos.coords.latitude;
+          userLng = pos.coords.longitude;
+          map.setView([userLat, userLng], 13);
+          document.getElementById('location-banner').style.display = 'block';
+          placeUserMarker();
+          renderMarkers();
+        },
+        () => {
+          placeUserMarker();
+          renderMarkers();
+        }
+      );
+    } else {
+      placeUserMarker();
+      renderMarkers();
+    }
 
     document.getElementById('filter-sport').addEventListener('change', renderMarkers);
     document.getElementById('filter-distance').addEventListener('change', renderMarkers);
