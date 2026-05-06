@@ -5,137 +5,220 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Playdate — Sign Up</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fraunces:wght@600&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            background: #FFF5F7;
-            padding-top: 0;
-        }
+        body { background: #FFF5F7; padding-top: 0; min-height: 100vh; }
 
         .content {
             display: flex;
-            justify-content: center;
-            padding: 80px 20px 60px;
+            gap: 40px;
+            padding: 80px 40px 60px;
+            max-width: 1000px;
+            margin: 0 auto;
+            align-items: flex-start;
         }
 
-        .card {
+        .form-side {
+            flex: 1;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
-            padding: 40px;
-            width: 100%;
-            max-width: 440px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 36px 32px;
+            min-width: 0;
         }
 
-        .card h1 {
+        .form-side h1 {
             font-family: 'Pacifico', cursive;
-            font-size: 32px;
+            font-size: 28px;
             color: #000;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-align: center;
         }
 
-        .card .subtitle {
+        .form-side .subtitle {
             font-family: 'Fraunces', serif;
             font-weight: 600;
-            font-size: 16px;
+            font-size: 14px;
             color: #00B2A9;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
-        .field {
-            margin-bottom: 18px;
-        }
-
+        .field { margin-bottom: 16px; }
         .field label {
             display: block;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: #444;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
-
-        .field input {
+        .field input, .field select, .field textarea {
             width: 100%;
-            padding: 11px 16px;
+            padding: 10px 14px;
             border-radius: 12px;
             border: 1.5px solid #ddd;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 14px;
+            font-size: 13px;
             color: #333;
             outline: none;
+            box-sizing: border-box;
+            background: white;
         }
+        .field input:focus, .field select:focus, .field textarea:focus { border-color: #00B2A9; }
+        .field textarea { resize: none; height: 70px; }
 
-        .field input:focus {
-            border-color: #00B2A9;
-        }
-
-        .sports-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #444;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .sports-grid {
+        .gender-row {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: 10px;
+            margin-bottom: 16px;
         }
-
-        .sport-tag {
-            padding: 7px 16px;
-            border-radius: 20px;
+        .gender-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 12px;
             border: 1.5px solid #ddd;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 13px;
             font-weight: 600;
             color: #555;
             cursor: pointer;
-            font-family: 'Plus Jakarta Sans', sans-serif;
             background: white;
+            text-align: center;
+            transition: all 0.15s;
         }
-
-        .sport-tag.selected {
+        .gender-btn.selected {
             background: #F7567C;
             color: white;
             border-color: #F7567C;
         }
 
-        .add-sport {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 24px;
+        .avatar-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 8px;
+            display: block;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
-
-        .add-sport-btn {
-            padding: 7px 16px;
+        .avatar-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .avatar-tab {
+            padding: 5px 14px;
             border-radius: 20px;
-            border: 1.5px dashed #ccc;
-            font-size: 13px;
+            border: 1.5px solid #ddd;
+            font-size: 11px;
             font-weight: 600;
             color: #888;
             cursor: pointer;
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: white;
         }
-
-        .add-sport-btn:hover {
+        .avatar-tab.active {
+            background: #00B2A9;
+            color: white;
+            border-color: #00B2A9;
+        }
+        .avatar-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .avatar-option {
+            font-size: 26px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: white;
+        }
+        .avatar-option.selected {
             border-color: #F7567C;
-            color: #F7567C;
+            background: #fff0f3;
+        }
+        .upload-area {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .upload-area.visible { display: flex; }
+        .upload-btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1.5px dashed #ddd;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            background: white;
+            width: 100%;
+            text-align: center;
+        }
+        .upload-btn:hover { border-color: #00B2A9; color: #00B2A9; }
+        #photo-upload { display: none; }
+        .upload-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #F7567C;
+            display: none;
         }
 
+        .sports-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 8px;
+            display: block;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .sports-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+        .sport-tag {
+            padding: 5px 13px;
+            border-radius: 20px;
+            border: 1.5px solid #ddd;
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: white;
+        }
+        .sport-tag.selected { background: #F7567C; color: white; border-color: #F7567C; }
+        .add-sport { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+        .add-sport-btn {
+            padding: 5px 13px;
+            border-radius: 20px;
+            border: 1.5px dashed #ccc;
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: white;
+        }
+        .add-sport-btn:hover { border-color: #F7567C; color: #F7567C; }
         .add-sport-input {
             display: none;
-            padding: 7px 14px;
+            padding: 5px 12px;
             border-radius: 20px;
             border: 1.5px solid #00B2A9;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 13px;
+            font-size: 12px;
             outline: none;
-            width: 140px;
+            width: 120px;
         }
 
         .submit-btn {
@@ -143,52 +226,118 @@
             background: #F7567C;
             color: white;
             border: none;
-            padding: 14px;
+            padding: 13px;
             border-radius: 30px;
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-weight: 600;
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
         }
-
-        .submit-btn:hover {
-            background-color: #e04570;
-        }
-
+        .submit-btn:hover { background-color: #e04570; }
         .login-link {
             text-align: center;
-            margin-top: 16px;
-            font-size: 13px;
+            margin-top: 14px;
+            font-size: 12px;
             color: #888;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
+        .login-link a { color: #F7567C; font-weight: 600; text-decoration: none; }
 
-        .login-link a {
-            color: #F7567C;
-            font-weight: 600;
-            text-decoration: none;
+        .card-side {
+            width: 220px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 90px;
         }
+        .card-side-label {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: #aaa;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        .flip-hint { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; color: #bbb; }
+
+        .scene { width: 200px; height: 300px; perspective: 900px; cursor: pointer; }
+        .card-inner {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .scene.flipped .card-inner { transform: rotateY(180deg); }
+        .card-face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; -webkit-backface-visibility: hidden;
+            border-radius: 6px; overflow: hidden;
+            font-family: Arial, Helvetica, sans-serif;
+            background: white; box-sizing: border-box;
+            border: 9px solid #f5ede0;
+            outline: 1.5px solid #111;
+        }
+        .card-back-face { transform: rotateY(180deg); }
+        .card-inner-frame { display: flex; flex-direction: column; height: 100%; border: 1.5px solid #111; box-sizing: border-box; }
+
+        .f-top { background: #F7567C; padding: 3px 8px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #111; }
+        .f-top .brand { font-size: 8px; font-weight: 900; color: white; letter-spacing: 2px; }
+        .f-top .year { font-size: 8px; font-weight: 900; color: white; }
+        .f-photo {
+            width: 100%; flex: 1;
+            display: flex; align-items: flex-end; justify-content: center;
+            position: relative; overflow: hidden;
+            background: #00B2A9; border-bottom: 1.5px solid #111;
+        }
+        .avatar-display { font-size: 90px; line-height: 1; margin-bottom: -6px; }
+        .photo-display {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: none;
+            position: absolute; top: 0; left: 0;
+        }
+        .rc-flag { position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 44px 44px 0; border-color: transparent #F7567C transparent transparent; }
+        .rc-text { position: absolute; top: 4px; right: 4px; color: white; font-size: 7px; font-weight: 900; letter-spacing: 1px; }
+        .f-name-band { background: #111; display: flex; align-items: stretch; min-height: 38px; border-bottom: 1.5px solid #111; }
+        .f-stripe-l { background: #F7567C; width: 7px; flex-shrink: 0; }
+        .f-stripe-r { background: #00B2A9; width: 7px; flex-shrink: 0; }
+        .f-name-content { padding: 5px 8px; flex: 1; }
+        .f-name { color: white; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.1; }
+        .f-city { color: #F7567C; font-size: 7px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
+        .f-bottom { background: #111; padding: 3px 8px; display: flex; justify-content: space-between; }
+        .f-bottom .set { font-size: 7px; color: #555; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; }
+        .f-bottom .num { font-size: 7px; color: #F7567C; font-weight: 900; letter-spacing: 1px; }
+
+        .b-top { background: #111; padding: 3px 8px; display: flex; justify-content: space-between; border-bottom: 1.5px solid #111; }
+        .b-top .brand { font-size: 8px; font-weight: 900; color: #F7567C; letter-spacing: 1.5px; }
+        .b-top .num { font-size: 8px; font-weight: 900; color: #aaa; }
+        .b-accent { height: 4px; background: linear-gradient(90deg, #F7567C 50%, #00B2A9 50%); border-bottom: 1.5px solid #111; }
+        .b-body { padding: 8px 10px 36px; background: white; flex: 1; overflow: hidden; }
+        .b-name { font-size: 12px; font-weight: 900; color: #111; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1px; }
+        .b-city { font-size: 7px; color: #999; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 2px; }
+        .b-gender { font-size: 7px; font-weight: 900; color: #aaa; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+        .b-stats { display: flex; justify-content: space-around; background: #f5f5f5; border-radius: 3px; padding: 6px 2px; margin-bottom: 8px; }
+        .b-stat { text-align: center; }
+        .b-stat-num { font-size: 16px; font-weight: 900; color: #111; line-height: 1; }
+        .b-stat-lbl { font-size: 7px; color: #999; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 2px; }
+        .b-section-lbl { font-size: 7px; font-weight: 900; color: #999; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+        .b-sports { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 8px; }
+        .b-sport-pill { font-size: 7px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 2px 6px; border-radius: 2px; background: #111; color: white; }
+        .b-divider { border: none; border-top: 1px solid #eee; margin: 6px 0; }
+        .b-vibe { font-size: 8px; color: #555; margin-bottom: 6px; }
+        .b-vibe span { font-weight: 700; color: #F7567C; }
+        .b-bio { font-size: 8px; color: #666; font-style: italic; line-height: 1.5; border-left: 2px solid #F7567C; padding-left: 6px; }
+        .b-bottom { background: #F7567C; padding: 3px 8px; display: flex; justify-content: space-between; align-items: center; position: absolute; bottom: 0; left: 0; right: 0; border-top: 1.5px solid #111; }
+        .b-bottom .series { font-size: 7px; color: white; letter-spacing: 1.5px; font-weight: 700; text-transform: uppercase; }
+        .b-bottom .copy { font-size: 7px; color: rgba(255,255,255,0.6); }
 
         @media (max-width: 768px) {
-            .content {
-                padding: 70px 16px 40px;
-            }
-
-            .card {
-                padding: 28px 20px;
-            }
-
-            .card h1 {
-                font-size: 26px;
-            }
-
-            .card .subtitle {
-                font-size: 14px;
-            }
-
-            .submit-btn {
-                font-size: 15px;
-                padding: 12px;
-            }
+            .content { flex-direction: column; padding: 70px 16px 40px; align-items: center; }
+            .card-side { position: static; width: 100%; align-items: center; }
+            .form-side { padding: 24px 18px; }
         }
     </style>
 </head>
@@ -202,13 +351,14 @@
     </nav>
 
     <div class="content">
-        <div class="card">
-            <h1>Join Playdate</h1>
-            <p class="subtitle">Find athletes. Schedule games. Just play.</p>
+
+        <div class="form-side">
+            <h1>Build Your Card</h1>
+            <p class="subtitle">Every legend starts as a rookie.</p>
 
             <div class="field">
                 <label>Full name</label>
-                <input type="text" placeholder="Jane Smith">
+                <input type="text" id="input-name" placeholder="Jane Smith" oninput="updateCard()">
             </div>
             <div class="field">
                 <label>Email</label>
@@ -217,6 +367,66 @@
             <div class="field">
                 <label>Password</label>
                 <input type="password" placeholder="••••••••">
+            </div>
+            <div class="field">
+                <label>City</label>
+                <input type="text" id="input-city" placeholder="Miami, FL" oninput="updateCard()">
+            </div>
+
+            <div class="field">
+                <label>Gender</label>
+                <div class="gender-row">
+                    <button class="gender-btn" onclick="selectGender(this, 'Male')">Male</button>
+                    <button class="gender-btn" onclick="selectGender(this, 'Female')">Female</button>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Bio / Tagline</label>
+                <textarea id="input-bio" placeholder="Always down for a game — bring good vibes." oninput="updateCard()"></textarea>
+            </div>
+
+            <span class="avatar-label">Profile picture</span>
+            <div class="avatar-tabs">
+                <button class="avatar-tab active" onclick="switchTab(this, 'emoji')">Choose avatar</button>
+                <button class="avatar-tab" onclick="switchTab(this, 'upload')">Upload photo</button>
+            </div>
+
+            <div class="avatar-row" id="emoji-panel">
+                <button class="avatar-option selected" onclick="selectAvatar(this, '🏃')">🏃</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '🏃‍♀️')">🏃‍♀️</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '⛹️')">⛹️</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '⛹️‍♀️')">⛹️‍♀️</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '🏊')">🏊</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '🏊‍♀️')">🏊‍♀️</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '🚴')">🚴</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '🚴‍♀️')">🚴‍♀️</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '🏋️')">🏋️</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '🏋️‍♀️')">🏋️‍♀️</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '🤸')">🤸</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '🤸‍♀️')">🤸‍♀️</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '🤾')">🤾</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '🤾‍♀️')">🤾‍♀️</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '🧗')">🧗</button>
+                <button class="avatar-option" onclick="selectAvatar(this, '🏇')">🏇</button>
+            </div>
+
+            <div class="upload-area" id="upload-panel">
+                <img class="upload-preview" id="upload-preview" src="" alt="preview">
+                <button class="upload-btn" onclick="document.getElementById('photo-upload').click()">
+                    📷 Click to upload a photo
+                </button>
+                <input type="file" id="photo-upload" accept="image/*" onchange="handlePhotoUpload(event)">
+            </div>
+
+            <div class="field">
+                <label>Vibe</label>
+                <select id="input-vibe" onchange="updateCard()">
+                    <option value="">Select your vibe</option>
+                    <option value="Just for laughs">Just for laughs</option>
+                    <option value="Friendly match">Friendly match</option>
+                    <option value="Bring it on">Bring it on</option>
+                </select>
             </div>
 
             <span class="sports-label">Sports of interest</span>
@@ -231,20 +441,161 @@
                 <button class="sport-tag" onclick="toggleSport(this)">Pickleball</button>
                 <button class="sport-tag" onclick="toggleSport(this)">Golf</button>
             </div>
-
             <div class="add-sport">
                 <button class="add-sport-btn" onclick="showAddSport()">+ Add sport</button>
                 <input class="add-sport-input" id="add-sport-input" type="text" placeholder="e.g. Rowing" onkeydown="addCustomSport(event)">
             </div>
 
-            <button class="submit-btn">Create Account ↗</button>
+            <button class="submit-btn">Create My Card ↗</button>
             <p class="login-link">Already have an account? <a href="#">Log in</a></p>
         </div>
+
+        <div class="card-side">
+            <div class="card-side-label">Your Player Card</div>
+            <div class="scene" id="scene" onclick="this.classList.toggle('flipped')">
+                <div class="card-inner">
+                    <div class="card-face card-front">
+                        <div class="card-inner-frame">
+                            <div class="f-top">
+                                <div class="brand">PLAYDATE</div>
+                                <div class="year">2026</div>
+                            </div>
+                            <div class="f-photo">
+                                <div class="avatar-display" id="card-avatar">🏃</div>
+                                <img class="photo-display" id="card-photo" src="" alt="">
+                                <div class="rc-flag"></div>
+                                <div class="rc-text">RC</div>
+                            </div>
+                            <div class="f-name-band">
+                                <div class="f-stripe-l"></div>
+                                <div class="f-name-content">
+                                    <div class="f-name" id="card-name">YOUR NAME</div>
+                                    <div class="f-city" id="card-city">📍 YOUR CITY</div>
+                                </div>
+                                <div class="f-stripe-r"></div>
+                            </div>
+                            <div class="f-bottom">
+                                <div class="set">Series 1</div>
+                                <div class="num">#001</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-face card-back-face">
+                        <div class="card-inner-frame">
+                            <div class="b-top">
+                                <div class="brand">PLAYDATE</div>
+                                <div class="num">#001</div>
+                            </div>
+                            <div class="b-accent"></div>
+                            <div class="b-body">
+                                <div class="b-name" id="card-name-back">YOUR NAME</div>
+                                <div class="b-city" id="card-city-back">📍 YOUR CITY</div>
+                                <div class="b-gender" id="card-gender"></div>
+                                <div class="b-stats">
+                                    <div class="b-stat"><div class="b-stat-num">0</div><div class="b-stat-lbl">Played</div></div>
+                                    <div class="b-stat"><div class="b-stat-num" id="sports-count">0</div><div class="b-stat-lbl">Sports</div></div>
+                                    <div class="b-stat"><div class="b-stat-num">0</div><div class="b-stat-lbl">Cities</div></div>
+                                </div>
+                                <div class="b-section-lbl">Sports</div>
+                                <div class="b-sports" id="card-sports"></div>
+                                <hr class="b-divider">
+                                <div class="b-vibe">Vibe: <span id="card-vibe">—</span></div>
+                                <div class="b-bio" id="card-bio"></div>
+                            </div>
+                            <div class="b-bottom">
+                                <div class="series">Rookie · Series 1</div>
+                                <div class="copy">© Playdate 2026</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flip-hint">Tap card to flip</div>
+        </div>
+
     </div>
 
     <script>
+        let selectedAvatar = '🏃';
+        let usingPhoto = false;
+
+        function updateCard() {
+            const name = document.getElementById('input-name').value.trim();
+            const city = document.getElementById('input-city').value.trim();
+            const bio = document.getElementById('input-bio').value.trim();
+            const vibe = document.getElementById('input-vibe').value;
+            document.getElementById('card-name').textContent = name ? name.toUpperCase() : 'YOUR NAME';
+            document.getElementById('card-name-back').textContent = name ? name.toUpperCase() : 'YOUR NAME';
+            document.getElementById('card-city').textContent = city ? '📍 ' + city : '📍 YOUR CITY';
+            document.getElementById('card-city-back').textContent = city ? '📍 ' + city : '📍 YOUR CITY';
+            document.getElementById('card-vibe').textContent = vibe || '—';
+            document.getElementById('card-bio').textContent = bio ? '"' + bio + '"' : '';
+            updateSportsOnCard();
+        }
+
+        function selectGender(el, gender) {
+            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('card-gender').textContent = gender === 'Male' ? 'M' : 'F';
+        }
+
+        function switchTab(el, tab) {
+            document.querySelectorAll('.avatar-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            if (tab === 'emoji') {
+                document.getElementById('emoji-panel').style.display = 'flex';
+                document.getElementById('upload-panel').classList.remove('visible');
+                usingPhoto = false;
+                document.getElementById('card-avatar').style.display = 'block';
+                document.getElementById('card-photo').style.display = 'none';
+            } else {
+                document.getElementById('emoji-panel').style.display = 'none';
+                document.getElementById('upload-panel').classList.add('visible');
+            }
+        }
+
+        function selectAvatar(el, emoji) {
+            document.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedAvatar = emoji;
+            document.getElementById('card-avatar').textContent = emoji;
+            usingPhoto = false;
+            document.getElementById('card-avatar').style.display = 'block';
+            document.getElementById('card-photo').style.display = 'none';
+        }
+
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const src = e.target.result;
+                document.getElementById('upload-preview').src = src;
+                document.getElementById('upload-preview').style.display = 'block';
+                document.getElementById('card-photo').src = src;
+                document.getElementById('card-photo').style.display = 'block';
+                document.getElementById('card-avatar').style.display = 'none';
+                usingPhoto = true;
+            };
+            reader.readAsDataURL(file);
+        }
+
         function toggleSport(el) {
             el.classList.toggle('selected');
+            updateSportsOnCard();
+        }
+
+        function updateSportsOnCard() {
+            const selected = Array.from(document.querySelectorAll('.sport-tag.selected')).map(t => t.textContent);
+            const container = document.getElementById('card-sports');
+            container.innerHTML = '';
+            selected.forEach(s => {
+                const pill = document.createElement('div');
+                pill.className = 'b-sport-pill';
+                pill.textContent = s;
+                container.appendChild(pill);
+            });
+            document.getElementById('sports-count').textContent = selected.length;
         }
 
         function showAddSport() {
@@ -265,6 +616,7 @@
                     document.getElementById('sports-grid').appendChild(tag);
                     input.value = '';
                     input.style.display = 'none';
+                    updateSportsOnCard();
                 }
             }
         }
