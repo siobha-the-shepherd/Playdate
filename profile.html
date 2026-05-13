@@ -4,189 +4,341 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Playdate — My Profile</title>
+    <script>if (!localStorage.getItem('playdateUser')) window.location.replace('signup.html');</script>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fraunces:wght@600&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            background: #f0fafa;
+            background: #fdf8f2;
             padding-top: 55px;
         }
 
-        .content {
-            display: flex;
-            justify-content: center;
-            padding: 50px 20px 60px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-            padding: 40px;
-            width: 100%;
-            max-width: 500px;
-        }
-
-        .photo-area {
+        .profile-wrap {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 24px;
+            gap: 28px;
         }
 
-        .avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: #F7567C;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            margin-bottom: 12px;
-            border: 4px solid white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        .welcome {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 20px;
+            color: #00B2A9;
+            text-align: center;
         }
 
-        .name {
+        /* ---- Flip card (matches signup.html) ---- */
+        .scene { width: 200px; height: 300px; perspective: 900px; cursor: pointer; }
+        .card-inner {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .scene.flipped .card-inner { transform: rotateY(180deg); }
+        .card-face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; -webkit-backface-visibility: hidden;
+            border-radius: 6px; overflow: hidden;
+            font-family: Arial, Helvetica, sans-serif;
+            background: white; box-sizing: border-box;
+            border: 9px solid #f5ede0;
+            outline: 1.5px solid #111;
+        }
+        .card-back-face { transform: rotateY(180deg); }
+        .card-inner-frame { display: flex; flex-direction: column; height: 100%; border: 1.5px solid #111; box-sizing: border-box; }
+        .f-top { background: #F7567C; padding: 3px 8px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #111; }
+        .f-top .brand { font-size: 8px; font-weight: 900; color: white; letter-spacing: 2px; }
+        .f-top .year { font-size: 8px; font-weight: 900; color: white; }
+        .f-photo { width: 100%; flex: 1; display: flex; align-items: flex-end; justify-content: center; position: relative; overflow: hidden; background: #00B2A9; border-bottom: 1.5px solid #111; }
+        .avatar-display { font-size: 90px; line-height: 1; margin-bottom: -6px; }
+        .photo-display { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
+        .rc-flag { position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 44px 44px 0; border-color: transparent #F7567C transparent transparent; }
+        .rc-text { position: absolute; top: 4px; right: 4px; color: white; font-size: 7px; font-weight: 900; letter-spacing: 1px; }
+        .f-name-band { background: #111; display: flex; align-items: stretch; min-height: 38px; border-bottom: 1.5px solid #111; }
+        .f-stripe-l { background: #F7567C; width: 7px; flex-shrink: 0; }
+        .f-stripe-r { background: #00B2A9; width: 7px; flex-shrink: 0; }
+        .f-name-content { padding: 5px 8px; flex: 1; }
+        .f-name { color: white; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.1; }
+        .f-city { color: #F7567C; font-size: 7px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
+        .f-bottom { background: #111; padding: 3px 8px; display: flex; justify-content: space-between; }
+        .f-bottom .set { font-size: 7px; color: #555; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; }
+        .f-bottom .num { font-size: 7px; color: #F7567C; font-weight: 900; letter-spacing: 1px; }
+        .b-top { background: #111; padding: 3px 8px; display: flex; justify-content: space-between; border-bottom: 1.5px solid #111; }
+        .b-top .brand { font-size: 8px; font-weight: 900; color: #F7567C; letter-spacing: 1.5px; }
+        .b-top .num { font-size: 8px; font-weight: 900; color: #aaa; }
+        .b-accent { height: 4px; background: linear-gradient(90deg, #F7567C 50%, #00B2A9 50%); border-bottom: 1.5px solid #111; }
+        .b-body { padding: 8px 10px 36px; background: white; flex: 1; overflow: hidden; }
+        .b-name { font-size: 12px; font-weight: 900; color: #111; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1px; }
+        .b-city { font-size: 7px; color: #999; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 2px; }
+        .b-gender { font-size: 7px; font-weight: 900; color: #aaa; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+        .b-stats { display: flex; justify-content: space-around; background: #f5f5f5; border-radius: 3px; padding: 6px 2px; margin-bottom: 8px; }
+        .b-stat { text-align: center; }
+        .b-stat-num { font-size: 16px; font-weight: 900; color: #111; line-height: 1; }
+        .b-stat-lbl { font-size: 7px; color: #999; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 2px; }
+        .b-section-lbl { font-size: 7px; font-weight: 900; color: #999; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+        .b-sports { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 8px; }
+        .b-sport-pill { font-size: 7px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 2px 6px; border-radius: 2px; background: #111; color: white; }
+        .b-divider { border: none; border-top: 1px solid #eee; margin: 6px 0; }
+        .b-vibe { font-size: 8px; color: #555; margin-bottom: 6px; }
+        .b-vibe span { font-weight: 700; color: #F7567C; }
+        .b-bio { font-size: 8px; color: #666; font-style: italic; line-height: 1.5; border-left: 2px solid #F7567C; padding-left: 6px; }
+        .b-bottom { background: #F7567C; padding: 3px 8px; display: flex; justify-content: space-between; align-items: center; position: absolute; bottom: 0; left: 0; right: 0; border-top: 1.5px solid #111; }
+        .b-bottom .series { font-size: 7px; color: white; letter-spacing: 1.5px; font-weight: 700; text-transform: uppercase; }
+        .b-bottom .copy { font-size: 7px; color: rgba(255,255,255,0.6); }
+
+        .flip-hint { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; color: #bbb; }
+
+        /* ---- Profile info card ---- */
+        .info-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 28px 28px 24px;
+            width: 100%;
+        }
+
+        .info-name {
             font-family: 'Pacifico', cursive;
-            font-size: 26px;
+            font-size: 22px;
             color: #000;
             margin-bottom: 4px;
         }
 
-        .location {
+        .info-location {
             font-size: 13px;
             color: #888;
-        }
-
-        .divider {
-            border: none;
-            border-top: 1px solid #eee;
-            margin: 24px 0;
+            margin-bottom: 20px;
         }
 
         .section-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             color: #aaa;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .tags {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-bottom: 24px;
+            margin-bottom: 18px;
         }
 
         .tag {
-            padding: 7px 16px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
-        .tag-sport {
-            background: #fff0f4;
-            color: #F7567C;
-            border: 1.5px solid #F7567C;
-        }
+        .tag-sport { background: #fff0f4; color: #F7567C; border: 1.5px solid #F7567C; }
+        .tag-vibe  { background: #f0fafa; color: #00B2A9; border: 1.5px solid #00B2A9; }
 
-        .tag-vibe {
-            background: #f0fafa;
-            color: #00B2A9;
-            border: 1.5px solid #00B2A9;
-        }
-
-        .bio {
+        .info-bio {
             font-size: 14px;
             color: #555;
             line-height: 1.6;
-            margin-bottom: 24px;
+            margin-bottom: 22px;
         }
+
+        .info-divider { border: none; border-top: 1px solid #eee; margin: 4px 0 18px; }
 
         .edit-btn {
             width: 100%;
             background: #F7567C;
             color: white;
             border: none;
-            padding: 14px;
+            padding: 13px;
             border-radius: 30px;
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-weight: 600;
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
+            display: block;
+            margin: 0;
         }
-
-        .edit-btn:hover {
-            background: #e04570;
-        }
+        .edit-btn:hover { background: #e04570; }
 
         @media (max-width: 768px) {
-            .content {
-                padding: 30px 16px 40px;
-            }
-
-            .card {
-                padding: 28px 20px;
-            }
-
-            .avatar {
-                width: 80px;
-                height: 80px;
-                font-size: 32px;
-            }
-
-            .name {
-                font-size: 22px;
-            }
-
-            .edit-btn {
-                font-size: 15px;
-                padding: 12px;
-            }
+            .profile-wrap { padding: 28px 16px 40px; gap: 20px; }
+            .info-card { padding: 22px 18px 20px; }
         }
     </style>
 </head>
 <body>
     <nav>
         <span onclick="window.location.href='index.html'" style="cursor: pointer;">Playdate</span>
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="signup.html">Sign Up</a>
-        <a href="profile.html" class="profile-icon">👤</a>
+        <button class="hamburger" id="hamburger" onclick="document.getElementById('nav-links').classList.toggle('open');this.classList.toggle('open')" aria-label="Open menu">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="nav-links" id="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="signup.html">Sign Up</a>
+            <a href="profile.html" class="profile-icon">👤</a>
+        </div>
     </nav>
 
-    <div class="content">
-        <div class="card">
-            <div class="photo-area">
-                <div class="avatar">🏃</div>
-                <div class="name">Jeremy Hernandez</div>
-                <div class="location">📍 Miami, FL</div>
+    <div class="profile-wrap">
+        <div class="welcome" id="welcome-msg">Welcome back!</div>
+
+        <div class="scene" id="scene" onclick="this.classList.toggle('flipped')">
+            <div class="card-inner">
+                <div class="card-face card-front">
+                    <div class="card-inner-frame">
+                        <div class="f-top">
+                            <div class="brand">PLAYDATE</div>
+                            <div class="year">2026</div>
+                        </div>
+                        <div class="f-photo">
+                            <div class="avatar-display" id="card-avatar">🏃</div>
+                            <img class="photo-display" id="card-photo" src="" alt="" style="display:none">
+                            <div class="rc-flag"></div>
+                            <div class="rc-text">RC</div>
+                        </div>
+                        <div class="f-name-band">
+                            <div class="f-stripe-l"></div>
+                            <div class="f-name-content">
+                                <div class="f-name" id="card-name">YOUR NAME</div>
+                                <div class="f-city" id="card-city">📍 YOUR CITY</div>
+                            </div>
+                            <div class="f-stripe-r"></div>
+                        </div>
+                        <div class="f-bottom">
+                            <div class="set">Series 1</div>
+                            <div class="num">#001</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-face card-back-face">
+                    <div class="card-inner-frame">
+                        <div class="b-top">
+                            <div class="brand">PLAYDATE</div>
+                            <div class="num">#001</div>
+                        </div>
+                        <div class="b-accent"></div>
+                        <div class="b-body">
+                            <div class="b-name" id="card-name-back">YOUR NAME</div>
+                            <div class="b-city" id="card-city-back">📍 YOUR CITY</div>
+                            <div class="b-gender" id="card-gender"></div>
+                            <div class="b-stats">
+                                <div class="b-stat"><div class="b-stat-num">0</div><div class="b-stat-lbl">Played</div></div>
+                                <div class="b-stat"><div class="b-stat-num" id="sports-count">0</div><div class="b-stat-lbl">Sports</div></div>
+                                <div class="b-stat"><div class="b-stat-num">0</div><div class="b-stat-lbl">Cities</div></div>
+                            </div>
+                            <div class="b-section-lbl">Sports</div>
+                            <div class="b-sports" id="card-sports"></div>
+                            <hr class="b-divider">
+                            <div class="b-vibe">Vibe: <span id="card-vibe">—</span></div>
+                            <div class="b-bio" id="card-bio"></div>
+                        </div>
+                        <div class="b-bottom">
+                            <div class="series">Rookie · Series 1</div>
+                            <div class="copy">© Playdate 2026</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flip-hint">Tap card to flip</div>
+
+        <div class="info-card">
+            <div class="info-name" id="info-name"></div>
+            <div class="info-location" id="info-location"></div>
+
+            <div id="sports-section">
+                <div class="section-title">Sports</div>
+                <div class="tags" id="info-sports"></div>
             </div>
 
-            <hr class="divider">
-
-            <div class="section-title">Sports</div>
-            <div class="tags">
-                <span class="tag tag-sport">Tennis</span>
-                <span class="tag tag-sport">Running</span>
-                <span class="tag tag-sport">Pickleball</span>
+            <div id="vibe-section">
+                <div class="section-title">Vibe</div>
+                <div class="tags" id="info-vibe"></div>
             </div>
 
-            <div class="section-title">Vibe</div>
-            <div class="tags">
-                <span class="tag tag-vibe">Friendly match</span>
-                <span class="tag tag-vibe">Just for laughs</span>
+            <div id="bio-section">
+                <div class="section-title">Bio</div>
+                <p class="info-bio" id="info-bio"></p>
             </div>
 
-            <div class="section-title">Bio</div>
-            <p class="bio">Miami-based athlete who loves early morning runs and weekend tennis. Always down for a friendly match — just bring your A game and good vibes.</p>
-
-            <button class="edit-btn">Edit Profile ↗</button>
+            <hr class="info-divider">
+            <button class="edit-btn" onclick="window.location.href='signup.html'">Edit Profile ↗</button>
         </div>
     </div>
+
+    <script>
+        const u = JSON.parse(localStorage.getItem('playdateUser'));
+
+        // Welcome
+        document.getElementById('welcome-msg').textContent =
+            u.name ? 'Welcome back, ' + u.name.split(' ')[0] + '!' : 'Welcome back!';
+
+        // Card front
+        document.getElementById('card-name').textContent = u.name ? u.name.toUpperCase() : 'YOUR NAME';
+        document.getElementById('card-city').textContent = u.city ? '📍 ' + u.city : '📍 YOUR CITY';
+        if (u.usingPhoto && u.photo) {
+            document.getElementById('card-photo').src = u.photo;
+            document.getElementById('card-photo').style.display = 'block';
+            document.getElementById('card-avatar').style.display = 'none';
+        } else {
+            document.getElementById('card-avatar').textContent = u.avatar || '🏃';
+        }
+
+        // Card back
+        document.getElementById('card-name-back').textContent = u.name ? u.name.toUpperCase() : 'YOUR NAME';
+        document.getElementById('card-city-back').textContent = u.city ? '📍 ' + u.city : '📍 YOUR CITY';
+        if (u.gender) document.getElementById('card-gender').textContent = u.gender === 'Male' ? 'M' : 'F';
+        document.getElementById('card-vibe').textContent = u.vibe || '—';
+        if (u.bio) document.getElementById('card-bio').textContent = '"' + u.bio + '"';
+
+        var sports = u.sports || [];
+        var sportsContainer = document.getElementById('card-sports');
+        sports.forEach(function(s) {
+            var pill = document.createElement('div');
+            pill.className = 'b-sport-pill';
+            pill.textContent = s;
+            sportsContainer.appendChild(pill);
+        });
+        document.getElementById('sports-count').textContent = sports.length;
+
+        // Info card
+        document.getElementById('info-name').textContent = u.name || '';
+        document.getElementById('info-location').textContent = u.city ? '📍 ' + u.city : '';
+
+        if (sports.length > 0) {
+            var sportsEl = document.getElementById('info-sports');
+            sports.forEach(function(s) {
+                var tag = document.createElement('span');
+                tag.className = 'tag tag-sport';
+                tag.textContent = s;
+                sportsEl.appendChild(tag);
+            });
+        } else {
+            document.getElementById('sports-section').style.display = 'none';
+        }
+
+        if (u.vibe) {
+            var vibeTag = document.createElement('span');
+            vibeTag.className = 'tag tag-vibe';
+            vibeTag.textContent = u.vibe;
+            document.getElementById('info-vibe').appendChild(vibeTag);
+        } else {
+            document.getElementById('vibe-section').style.display = 'none';
+        }
+
+        if (u.bio) {
+            document.getElementById('info-bio').textContent = u.bio;
+        } else {
+            document.getElementById('bio-section').style.display = 'none';
+        }
+    </script>
 </body>
 </html>

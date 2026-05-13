@@ -32,6 +32,7 @@
     }
     .popup-name { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 15px; }
     .popup-sport { color: #F7567C; font-weight: 600; font-size: 13px; margin: 2px 0; }
+    .popup-vibe { display: inline-block; background: #f0fafa; color: #00B2A9; border: 1.5px solid #00B2A9; border-radius: 20px; font-size: 11px; font-weight: 600; padding: 2px 10px; margin: 4px 0 6px; font-family: 'Plus Jakarta Sans', sans-serif; }
     .popup-meta { font-size: 12px; color: #888; margin-bottom: 8px; }
     .popup-btn {
       background: #F7567C;
@@ -73,10 +74,15 @@
 
   <nav>
     <span onclick="window.location.href='index.html'" style="cursor: pointer;">Playdate</span>
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="signup.html">Sign Up</a>
-    <a href="signup.html" class="profile-icon">👤</a>
+    <button class="hamburger" id="hamburger" onclick="document.getElementById('nav-links').classList.toggle('open');this.classList.toggle('open')" aria-label="Open menu">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="signup.html">Sign Up</a>
+        <a href="profile.html" class="profile-icon">👤</a>
+    </div>
   </nav>
 
   <div id="location-banner">📍 Using your location to find nearby athletes</div>
@@ -180,7 +186,8 @@
             .bindPopup(`
               <div class="popup-name">${a.name}</div>
               <div class="popup-sport">${a.sport}</div>
-              <div class="popup-meta">${a.skill} · ${dist.toFixed(1)} miles away</div>
+              <div><span class="popup-vibe">${a.skill}</span></div>
+              <div class="popup-meta">${dist.toFixed(1)} miles away</div>
               <button class="popup-btn" onclick="window.location.href='signup.html'">Schedule a Playdate ↗</button>
             `);
           markers.push(marker);

@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fraunces:wght@600&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            background: #fdf8f2;
+            background: #b2e8e6;
             padding-top: 55px;
         }
 
@@ -28,8 +28,8 @@
             font-family: 'Fraunces', serif;
             font-weight: 600;
             font-size: 22px;
-            color: white;
-            background: #00B2A9;
+            color: #000;
+            background: #f5ede0;
             display: inline-block;
             padding: 12px 28px;
             border-radius: 30px;
@@ -126,10 +126,15 @@
 <body>
     <nav>
         <span onclick="window.location.href='index.html'" style="cursor: pointer;">Playdate</span>
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="signup.html">Sign Up</a>
-        <a href="signup.html" class="profile-icon">👤</a>
+        <button class="hamburger" id="hamburger" onclick="document.getElementById('nav-links').classList.toggle('open');this.classList.toggle('open')" aria-label="Open menu">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="nav-links" id="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="signup.html">Sign Up</a>
+            <a href="profile.html" class="profile-icon">👤</a>
+        </div>
     </nav>
 
     <div class="about-hero">
@@ -143,12 +148,12 @@
         <div class="step">
             <div class="step-num">1</div>
             <h3>Create your profile</h3>
-            <p>Tell us your sport, skill level, and neighbourhood.</p>
+            <p>Complete your Player Card so the right athletes can find you.</p>
         </div>
         <div class="step">
             <div class="step-num">2</div>
-            <h3>Find athletes nearby</h3>
-            <p>Browse the map and connect with athletes near you.</p>
+            <h3>Connect with athletes in your community.</h3>
+            <p>Browse the map and find athletes near you.</p>
         </div>
         <div class="step">
             <div class="step-num">3</div>

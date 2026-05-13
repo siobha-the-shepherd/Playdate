@@ -344,10 +344,15 @@
 <body>
     <nav>
         <span onclick="window.location.href='index.html'" style="cursor: pointer;">Playdate</span>
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="signup.html">Sign Up</a>
-        <a href="signup.html" class="profile-icon">👤</a>
+        <button class="hamburger" id="hamburger" onclick="document.getElementById('nav-links').classList.toggle('open');this.classList.toggle('open')" aria-label="Open menu">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="nav-links" id="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="signup.html">Sign Up</a>
+            <a href="profile.html" class="profile-icon">👤</a>
+        </div>
     </nav>
 
     <div class="content">
@@ -446,7 +451,7 @@
                 <input class="add-sport-input" id="add-sport-input" type="text" placeholder="e.g. Rowing" onkeydown="addCustomSport(event)">
             </div>
 
-            <button class="submit-btn">Create My Card ↗</button>
+            <button class="submit-btn" onclick="saveAndRedirect()">Create My Card ↗</button>
             <p class="login-link">Already have an account? <a href="#">Log in</a></p>
         </div>
 
@@ -518,6 +523,7 @@
     <script>
         let selectedAvatar = '🏃';
         let usingPhoto = false;
+        let selectedGender = '';
 
         function updateCard() {
             const name = document.getElementById('input-name').value.trim();
@@ -536,6 +542,7 @@
         function selectGender(el, gender) {
             document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
             el.classList.add('selected');
+            selectedGender = gender;
             document.getElementById('card-gender').textContent = gender === 'Male' ? 'M' : 'F';
         }
 
@@ -619,6 +626,34 @@
                     updateSportsOnCard();
                 }
             }
+        }
+
+        function saveAndRedirect() {
+            const name = document.getElementById('input-name').value.trim();
+            if (!name) {
+                alert('Please enter your name to create your card.');
+                document.getElementById('input-name').focus();
+                return;
+            }
+            const userData = {
+                name: name,
+                city: document.getElementById('input-city').value.trim(),
+                bio: document.getElementById('input-bio').value.trim(),
+                vibe: document.getElementById('input-vibe').value,
+                sports: Array.from(document.querySelectorAll('.sport-tag.selected')).map(function(t) { return t.textContent; }),
+                gender: selectedGender,
+                avatar: selectedAvatar,
+                usingPhoto: usingPhoto,
+                photo: usingPhoto ? document.getElementById('card-photo').src : null
+            };
+            try {
+                localStorage.setItem('playdateUser', JSON.stringify(userData));
+            } catch (e) {
+                userData.photo = null;
+                userData.usingPhoto = false;
+                localStorage.setItem('playdateUser', JSON.stringify(userData));
+            }
+            window.location.href = 'profile.html';
         }
     </script>
 </body>
