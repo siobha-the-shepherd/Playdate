@@ -152,27 +152,35 @@
             margin-bottom: 16px;
         }
         .upload-area.visible { display: flex; }
-        .upload-btn {
-            padding: 10px 20px;
-            border-radius: 12px;
-            border: 1.5px dashed #ddd;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 12px;
-            font-weight: 600;
-            color: #888;
+        .upload-circle-wrap {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 2.5px dashed #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            background: white;
-            width: 100%;
-            text-align: center;
+            overflow: hidden;
+            position: relative;
+            background: #fafafa;
+            transition: border-color 0.15s;
         }
-        .upload-btn:hover { border-color: #00B2A9; color: #00B2A9; }
+        .upload-circle-wrap:hover { border-color: #00B2A9; }
+        .upload-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 8px;
+        }
+        .upload-icon { font-size: 28px; display: block; margin-bottom: 4px; }
+        .upload-label { font-size: 10px; color: #aaa; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; }
         #photo-upload { display: none; }
         .upload-preview {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            border: 2px solid #F7567C;
             display: none;
         }
 
@@ -318,7 +326,8 @@
         .b-body { padding: 8px 10px 36px; background: white; flex: 1; overflow: hidden; }
         .b-name { font-size: 12px; font-weight: 900; color: #111; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1px; }
         .b-city { font-size: 7px; color: #999; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 2px; }
-        .b-gender { font-size: 7px; font-weight: 900; color: #aaa; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+        .b-gender { font-size: 7px; font-weight: 900; color: #aaa; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 3px; }
+        .b-skill { font-size: 7px; font-weight: 700; color: #00B2A9; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
         .b-stats { display: flex; justify-content: space-around; background: #f5f5f5; border-radius: 3px; padding: 6px 2px; margin-bottom: 8px; }
         .b-stat { text-align: center; }
         .b-stat-num { font-size: 16px; font-weight: 900; color: #111; line-height: 1; }
@@ -377,6 +386,10 @@
                 <label>City</label>
                 <input type="text" id="input-city" placeholder="Miami, FL" oninput="updateCard()">
             </div>
+            <div class="field">
+                <label>Age</label>
+                <input type="number" id="input-age" placeholder="25" min="13" max="99" oninput="updateCard()">
+            </div>
 
             <div class="field">
                 <label>Gender</label>
@@ -417,13 +430,26 @@
             </div>
 
             <div class="upload-area" id="upload-panel">
-                <img class="upload-preview" id="upload-preview" src="" alt="preview">
-                <button class="upload-btn" onclick="document.getElementById('photo-upload').click()">
-                    📷 Click to upload a photo
-                </button>
+                <div class="upload-circle-wrap" onclick="document.getElementById('photo-upload').click()">
+                    <div class="upload-placeholder" id="upload-placeholder">
+                        <span class="upload-icon">📷</span>
+                        <span class="upload-label">Tap to upload</span>
+                    </div>
+                    <img class="upload-preview" id="upload-preview" src="" alt="">
+                </div>
                 <input type="file" id="photo-upload" accept="image/*" onchange="handlePhotoUpload(event)">
             </div>
 
+            <div class="field">
+                <label>Skill Level</label>
+                <select id="input-skill" onchange="updateCard()">
+                    <option value="">Select skill level</option>
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Expert">Expert</option>
+                </select>
+            </div>
             <div class="field">
                 <label>Vibe</label>
                 <select id="input-vibe" onchange="updateCard()">
@@ -496,10 +522,11 @@
                                 <div class="b-name" id="card-name-back">YOUR NAME</div>
                                 <div class="b-city" id="card-city-back">📍 YOUR CITY</div>
                                 <div class="b-gender" id="card-gender"></div>
+                                <div class="b-skill" id="card-skill"></div>
                                 <div class="b-stats">
-                                    <div class="b-stat"><div class="b-stat-num">0</div><div class="b-stat-lbl">Played</div></div>
+                                    <div class="b-stat"><div class="b-stat-num" id="card-age-stat">—</div><div class="b-stat-lbl">Age</div></div>
                                     <div class="b-stat"><div class="b-stat-num" id="sports-count">0</div><div class="b-stat-lbl">Sports</div></div>
-                                    <div class="b-stat"><div class="b-stat-num">0</div><div class="b-stat-lbl">Cities</div></div>
+                                    <div class="b-stat"><div class="b-stat-num">0</div><div class="b-stat-lbl">Played</div></div>
                                 </div>
                                 <div class="b-section-lbl">Sports</div>
                                 <div class="b-sports" id="card-sports"></div>
@@ -530,12 +557,16 @@
             const city = document.getElementById('input-city').value.trim();
             const bio = document.getElementById('input-bio').value.trim();
             const vibe = document.getElementById('input-vibe').value;
+            const skill = document.getElementById('input-skill').value;
+            const age = document.getElementById('input-age').value.trim();
             document.getElementById('card-name').textContent = name ? name.toUpperCase() : 'YOUR NAME';
             document.getElementById('card-name-back').textContent = name ? name.toUpperCase() : 'YOUR NAME';
             document.getElementById('card-city').textContent = city ? '📍 ' + city : '📍 YOUR CITY';
             document.getElementById('card-city-back').textContent = city ? '📍 ' + city : '📍 YOUR CITY';
             document.getElementById('card-vibe').textContent = vibe || '—';
             document.getElementById('card-bio').textContent = bio ? '"' + bio + '"' : '';
+            document.getElementById('card-skill').textContent = skill || '';
+            document.getElementById('card-age-stat').textContent = age || '—';
             updateSportsOnCard();
         }
 
@@ -577,6 +608,7 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const src = e.target.result;
+                document.getElementById('upload-placeholder').style.display = 'none';
                 document.getElementById('upload-preview').src = src;
                 document.getElementById('upload-preview').style.display = 'block';
                 document.getElementById('card-photo').src = src;
@@ -638,7 +670,9 @@
             const userData = {
                 name: name,
                 city: document.getElementById('input-city').value.trim(),
+                age: document.getElementById('input-age').value.trim(),
                 bio: document.getElementById('input-bio').value.trim(),
+                skillLevel: document.getElementById('input-skill').value,
                 vibe: document.getElementById('input-vibe').value,
                 sports: Array.from(document.querySelectorAll('.sport-tag.selected')).map(function(t) { return t.textContent; }),
                 gender: selectedGender,
@@ -655,6 +689,65 @@
             }
             window.location.href = 'profile.html';
         }
+
+        // Pre-fill form fields from localStorage when editing an existing profile
+        (function () {
+            var raw = localStorage.getItem('playdateUser');
+            if (!raw) return;
+            var u;
+            try { u = JSON.parse(raw); } catch (e) { return; }
+            if (!u) return;
+
+            if (u.name) document.getElementById('input-name').value = u.name;
+            if (u.city) document.getElementById('input-city').value = u.city;
+            if (u.age) document.getElementById('input-age').value = u.age;
+            if (u.bio) document.getElementById('input-bio').value = u.bio;
+            if (u.vibe) document.getElementById('input-vibe').value = u.vibe;
+            if (u.skillLevel) document.getElementById('input-skill').value = u.skillLevel;
+
+            if (u.gender) {
+                selectedGender = u.gender;
+                document.querySelectorAll('.gender-btn').forEach(function (btn) {
+                    if (btn.textContent.trim() === u.gender) btn.classList.add('selected');
+                });
+            }
+
+            var sports = u.sports || [];
+            sports.forEach(function (sport) {
+                var found = false;
+                document.querySelectorAll('.sport-tag').forEach(function (tag) {
+                    if (tag.textContent === sport) { tag.classList.add('selected'); found = true; }
+                });
+                if (!found) {
+                    var tag = document.createElement('button');
+                    tag.className = 'sport-tag selected';
+                    tag.textContent = sport;
+                    tag.onclick = function () { toggleSport(this); };
+                    document.getElementById('sports-grid').appendChild(tag);
+                }
+            });
+
+            if (u.usingPhoto && u.photo) {
+                switchTab(document.querySelectorAll('.avatar-tab')[1], 'upload');
+                document.getElementById('upload-placeholder').style.display = 'none';
+                document.getElementById('upload-preview').src = u.photo;
+                document.getElementById('upload-preview').style.display = 'block';
+                document.getElementById('card-photo').src = u.photo;
+                document.getElementById('card-photo').style.display = 'block';
+                document.getElementById('card-avatar').style.display = 'none';
+                usingPhoto = true;
+            } else if (u.avatar) {
+                selectedAvatar = u.avatar;
+                document.querySelectorAll('.avatar-option').forEach(function (btn) {
+                    btn.classList.remove('selected');
+                    if (btn.textContent.trim() === u.avatar) btn.classList.add('selected');
+                });
+                document.getElementById('card-avatar').textContent = u.avatar;
+            }
+
+            updateCard();
+            updateSportsOnCard();
+        })();
     </script>
 </body>
 </html>

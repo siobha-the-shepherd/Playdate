@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Playdate — My Profile</title>
-    <script>if (!localStorage.getItem('playdateUser')) window.location.replace('signup.html');</script>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fraunces:wght@600&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
@@ -13,15 +12,69 @@
             padding-top: 55px;
         }
 
+        /* ---- No-profile state ---- */
+        .no-profile {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 55px);
+            padding: 20px;
+        }
+
+        .no-profile-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 48px 40px;
+            text-align: center;
+            max-width: 380px;
+            width: 100%;
+        }
+
+        .no-profile-icon { font-size: 56px; margin-bottom: 16px; }
+
+        .no-profile-card h2 {
+            font-family: 'Pacifico', cursive;
+            font-size: 26px;
+            color: #000;
+            margin-bottom: 12px;
+        }
+
+        .no-profile-card p {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 28px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .no-profile-card button {
+            background: #F7567C;
+            color: white;
+            border: none;
+            padding: 13px 32px;
+            border-radius: 30px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            margin: 0;
+            width: auto;
+            display: inline-block;
+        }
+        .no-profile-card button:hover { background: #e04570; }
+
+        /* ---- Profile state ---- */
         .profile-wrap {
+            display: none;
             max-width: 520px;
             margin: 0 auto;
             padding: 40px 20px 60px;
-            display: flex;
             flex-direction: column;
             align-items: center;
             gap: 28px;
         }
+        .profile-wrap.visible { display: flex; }
 
         .welcome {
             font-family: 'Fraunces', serif;
@@ -31,7 +84,7 @@
             text-align: center;
         }
 
-        /* ---- Flip card (matches signup.html) ---- */
+        /* ---- Flip card (matches signup.html exactly) ---- */
         .scene { width: 200px; height: 300px; perspective: 900px; cursor: pointer; }
         .card-inner {
             width: 100%; height: 100%;
@@ -75,7 +128,8 @@
         .b-body { padding: 8px 10px 36px; background: white; flex: 1; overflow: hidden; }
         .b-name { font-size: 12px; font-weight: 900; color: #111; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1px; }
         .b-city { font-size: 7px; color: #999; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 2px; }
-        .b-gender { font-size: 7px; font-weight: 900; color: #aaa; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+        .b-gender { font-size: 7px; font-weight: 900; color: #aaa; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 3px; }
+        .b-skill { font-size: 7px; font-weight: 700; color: #00B2A9; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
         .b-stats { display: flex; justify-content: space-around; background: #f5f5f5; border-radius: 3px; padding: 6px 2px; margin-bottom: 8px; }
         .b-stat { text-align: center; }
         .b-stat-num { font-size: 16px; font-weight: 900; color: #111; line-height: 1; }
@@ -109,9 +163,10 @@
             margin-bottom: 4px;
         }
 
-        .info-location {
+        .info-meta {
             font-size: 13px;
             color: #888;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             margin-bottom: 20px;
         }
 
@@ -139,8 +194,9 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
-        .tag-sport { background: #fff0f4; color: #F7567C; border: 1.5px solid #F7567C; }
-        .tag-vibe  { background: #f0fafa; color: #00B2A9; border: 1.5px solid #00B2A9; }
+        .tag-sport  { background: #fff0f4; color: #F7567C; border: 1.5px solid #F7567C; }
+        .tag-skill  { background: #00B2A9; color: white;   border: 1.5px solid #00B2A9; }
+        .tag-vibe   { background: #f0fafa; color: #00B2A9; border: 1.5px solid #00B2A9; }
 
         .info-bio {
             font-size: 14px;
@@ -170,6 +226,7 @@
         @media (max-width: 768px) {
             .profile-wrap { padding: 28px 16px 40px; gap: 20px; }
             .info-card { padding: 22px 18px 20px; }
+            .no-profile-card { padding: 36px 24px; }
         }
     </style>
 </head>
@@ -187,10 +244,21 @@
         </div>
     </nav>
 
-    <div class="profile-wrap">
+    <!-- No-profile state -->
+    <div class="no-profile" id="no-profile">
+        <div class="no-profile-card">
+            <div class="no-profile-icon">🏅</div>
+            <h2>No card yet</h2>
+            <p>Build your Player Card and start connecting with athletes in your city.</p>
+            <button onclick="window.location.href='signup.html'">Create My Card ↗</button>
+        </div>
+    </div>
+
+    <!-- Profile state (revealed by JS when data exists) -->
+    <div class="profile-wrap" id="profile-wrap">
         <div class="welcome" id="welcome-msg">Welcome back!</div>
 
-        <div class="scene" id="scene" onclick="this.classList.toggle('flipped')">
+        <div class="scene" onclick="this.classList.toggle('flipped')">
             <div class="card-inner">
                 <div class="card-face card-front">
                     <div class="card-inner-frame">
@@ -229,15 +297,25 @@
                             <div class="b-name" id="card-name-back">YOUR NAME</div>
                             <div class="b-city" id="card-city-back">📍 YOUR CITY</div>
                             <div class="b-gender" id="card-gender"></div>
+                            <div class="b-skill" id="card-skill"></div>
                             <div class="b-stats">
-                                <div class="b-stat"><div class="b-stat-num">0</div><div class="b-stat-lbl">Played</div></div>
-                                <div class="b-stat"><div class="b-stat-num" id="sports-count">0</div><div class="b-stat-lbl">Sports</div></div>
-                                <div class="b-stat"><div class="b-stat-num">0</div><div class="b-stat-lbl">Cities</div></div>
+                                <div class="b-stat" id="card-age-stat-cell">
+                                    <div class="b-stat-num" id="card-age-stat">—</div>
+                                    <div class="b-stat-lbl">Age</div>
+                                </div>
+                                <div class="b-stat" id="card-sports-stat-cell">
+                                    <div class="b-stat-num" id="sports-count">0</div>
+                                    <div class="b-stat-lbl">Sports</div>
+                                </div>
+                                <div class="b-stat">
+                                    <div class="b-stat-num">0</div>
+                                    <div class="b-stat-lbl">Played</div>
+                                </div>
                             </div>
-                            <div class="b-section-lbl">Sports</div>
+                            <div class="b-section-lbl" id="card-sports-lbl">Sports</div>
                             <div class="b-sports" id="card-sports"></div>
-                            <hr class="b-divider">
-                            <div class="b-vibe">Vibe: <span id="card-vibe">—</span></div>
+                            <hr class="b-divider" id="card-divider">
+                            <div class="b-vibe" id="card-vibe-row">Vibe: <span id="card-vibe">—</span></div>
                             <div class="b-bio" id="card-bio"></div>
                         </div>
                         <div class="b-bottom">
@@ -252,11 +330,16 @@
 
         <div class="info-card">
             <div class="info-name" id="info-name"></div>
-            <div class="info-location" id="info-location"></div>
+            <div class="info-meta" id="info-meta"></div>
 
             <div id="sports-section">
                 <div class="section-title">Sports</div>
                 <div class="tags" id="info-sports"></div>
+            </div>
+
+            <div id="skill-section">
+                <div class="section-title">Skill Level</div>
+                <div class="tags" id="info-skill"></div>
             </div>
 
             <div id="vibe-section">
@@ -275,69 +358,109 @@
     </div>
 
     <script>
-        const u = JSON.parse(localStorage.getItem('playdateUser'));
-
-        // Welcome
-        document.getElementById('welcome-msg').textContent =
-            u.name ? 'Welcome back, ' + u.name.split(' ')[0] + '!' : 'Welcome back!';
-
-        // Card front
-        document.getElementById('card-name').textContent = u.name ? u.name.toUpperCase() : 'YOUR NAME';
-        document.getElementById('card-city').textContent = u.city ? '📍 ' + u.city : '📍 YOUR CITY';
-        if (u.usingPhoto && u.photo) {
-            document.getElementById('card-photo').src = u.photo;
-            document.getElementById('card-photo').style.display = 'block';
-            document.getElementById('card-avatar').style.display = 'none';
-        } else {
-            document.getElementById('card-avatar').textContent = u.avatar || '🏃';
+        var raw = localStorage.getItem('playdateUser');
+        var u = null;
+        if (raw) {
+            try {
+                var parsed = JSON.parse(raw);
+                if (parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)) u = parsed;
+            } catch (e) {}
         }
 
-        // Card back
-        document.getElementById('card-name-back').textContent = u.name ? u.name.toUpperCase() : 'YOUR NAME';
-        document.getElementById('card-city-back').textContent = u.city ? '📍 ' + u.city : '📍 YOUR CITY';
-        if (u.gender) document.getElementById('card-gender').textContent = u.gender === 'Male' ? 'M' : 'F';
-        document.getElementById('card-vibe').textContent = u.vibe || '—';
-        if (u.bio) document.getElementById('card-bio').textContent = '"' + u.bio + '"';
+        if (u) {
+            document.getElementById('no-profile').style.display = 'none';
+            document.getElementById('profile-wrap').classList.add('visible');
 
-        var sports = u.sports || [];
-        var sportsContainer = document.getElementById('card-sports');
-        sports.forEach(function(s) {
-            var pill = document.createElement('div');
-            pill.className = 'b-sport-pill';
-            pill.textContent = s;
-            sportsContainer.appendChild(pill);
-        });
-        document.getElementById('sports-count').textContent = sports.length;
+            // Welcome
+            document.getElementById('welcome-msg').textContent =
+                u.name ? 'Welcome back, ' + u.name.split(' ')[0] + '!' : 'Welcome back!';
 
-        // Info card
-        document.getElementById('info-name').textContent = u.name || '';
-        document.getElementById('info-location').textContent = u.city ? '📍 ' + u.city : '';
+            // Card front
+            document.getElementById('card-name').textContent = u.name ? u.name.toUpperCase() : 'YOUR NAME';
+            document.getElementById('card-city').textContent = u.city ? '📍 ' + u.city : '📍 YOUR CITY';
+            if (u.usingPhoto && u.photo) {
+                document.getElementById('card-photo').src = u.photo;
+                document.getElementById('card-photo').style.display = 'block';
+                document.getElementById('card-avatar').style.display = 'none';
+            } else {
+                document.getElementById('card-avatar').textContent = u.avatar || '🏃';
+            }
 
-        if (sports.length > 0) {
-            var sportsEl = document.getElementById('info-sports');
+            // Card back
+            document.getElementById('card-name-back').textContent = u.name ? u.name.toUpperCase() : 'YOUR NAME';
+            document.getElementById('card-city-back').textContent = u.city ? '📍 ' + u.city : '📍 YOUR CITY';
+            if (u.gender) document.getElementById('card-gender').textContent = u.gender === 'Male' ? 'M' : 'F';
+            if (u.skillLevel) document.getElementById('card-skill').textContent = u.skillLevel;
+            if (u.age) document.getElementById('card-age-stat').textContent = u.age;
+            document.getElementById('card-vibe').textContent = u.vibe || '—';
+            if (u.bio) document.getElementById('card-bio').textContent = '"' + u.bio + '"';
+
+            var sports = Array.isArray(u.sports) ? u.sports : [];
             sports.forEach(function(s) {
-                var tag = document.createElement('span');
-                tag.className = 'tag tag-sport';
-                tag.textContent = s;
-                sportsEl.appendChild(tag);
+                var pill = document.createElement('div');
+                pill.className = 'b-sport-pill';
+                pill.textContent = s;
+                document.getElementById('card-sports').appendChild(pill);
             });
-        } else {
-            document.getElementById('sports-section').style.display = 'none';
-        }
+            document.getElementById('sports-count').textContent = sports.length;
 
-        if (u.vibe) {
-            var vibeTag = document.createElement('span');
-            vibeTag.className = 'tag tag-vibe';
-            vibeTag.textContent = u.vibe;
-            document.getElementById('info-vibe').appendChild(vibeTag);
-        } else {
-            document.getElementById('vibe-section').style.display = 'none';
-        }
+            // Hide empty card-back fields
+            if (!u.gender) document.getElementById('card-gender').style.display = 'none';
+            if (!u.skillLevel) document.getElementById('card-skill').style.display = 'none';
+            if (!u.age) document.getElementById('card-age-stat-cell').style.display = 'none';
+            if (sports.length === 0) {
+                document.getElementById('card-sports-stat-cell').style.display = 'none';
+                document.getElementById('card-sports-lbl').style.display = 'none';
+                document.getElementById('card-divider').style.display = 'none';
+            }
+            if (!u.vibe) document.getElementById('card-vibe-row').style.display = 'none';
+            if (!u.bio) document.getElementById('card-bio').style.display = 'none';
 
-        if (u.bio) {
-            document.getElementById('info-bio').textContent = u.bio;
-        } else {
-            document.getElementById('bio-section').style.display = 'none';
+            // Info card — meta line: location + age
+            document.getElementById('info-name').textContent = u.name || '';
+            var metaParts = [];
+            if (u.city) metaParts.push('📍 ' + u.city);
+            if (u.age) metaParts.push('Age ' + u.age);
+            document.getElementById('info-meta').textContent = metaParts.join(' · ');
+
+            // Sports
+            if (sports.length > 0) {
+                sports.forEach(function(s) {
+                    var tag = document.createElement('span');
+                    tag.className = 'tag tag-sport';
+                    tag.textContent = s;
+                    document.getElementById('info-sports').appendChild(tag);
+                });
+            } else {
+                document.getElementById('sports-section').style.display = 'none';
+            }
+
+            // Skill level
+            if (u.skillLevel) {
+                var skillTag = document.createElement('span');
+                skillTag.className = 'tag tag-skill';
+                skillTag.textContent = u.skillLevel;
+                document.getElementById('info-skill').appendChild(skillTag);
+            } else {
+                document.getElementById('skill-section').style.display = 'none';
+            }
+
+            // Vibe
+            if (u.vibe) {
+                var vibeTag = document.createElement('span');
+                vibeTag.className = 'tag tag-vibe';
+                vibeTag.textContent = u.vibe;
+                document.getElementById('info-vibe').appendChild(vibeTag);
+            } else {
+                document.getElementById('vibe-section').style.display = 'none';
+            }
+
+            // Bio
+            if (u.bio) {
+                document.getElementById('info-bio').textContent = u.bio;
+            } else {
+                document.getElementById('bio-section').style.display = 'none';
+            }
         }
     </script>
 </body>

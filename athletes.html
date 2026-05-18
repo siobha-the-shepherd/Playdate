@@ -57,6 +57,67 @@
       display: none;
     }
 
+    .map-wrap {
+      position: relative;
+    }
+
+    #empty-state {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    #empty-state.visible {
+      display: flex;
+    }
+
+    .empty-card {
+      background: white;
+      border-radius: 20px;
+      padding: 36px 32px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      max-width: 320px;
+      pointer-events: all;
+    }
+
+    .empty-card .empty-emoji {
+      font-size: 48px;
+      margin-bottom: 14px;
+    }
+
+    .empty-card h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: #111;
+      margin: 0 0 10px;
+    }
+
+    .empty-card p {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px;
+      color: #888;
+      line-height: 1.6;
+      margin: 0 0 20px;
+    }
+
+    .empty-card a {
+      display: inline-block;
+      background: #F7567C;
+      color: white;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px 22px;
+      border-radius: 20px;
+      text-decoration: none;
+    }
+
     @media (max-width: 768px) {
       #map { height: calc(100vh - 180px); }
       .filters {
@@ -112,7 +173,17 @@
     </select>
   </div>
 
-  <div id="map"></div>
+  <div class="map-wrap">
+    <div id="map"></div>
+    <div id="empty-state">
+      <div class="empty-card">
+        <div class="empty-emoji">🏅</div>
+        <h3>No athletes nearby yet</h3>
+        <p>Check back soon — or invite a friend to join Playdate and make the first move.</p>
+        <a href="signup.html">Invite a Friend ↗</a>
+      </div>
+    </div>
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
@@ -193,6 +264,8 @@
           markers.push(marker);
         }
       });
+
+      document.getElementById('empty-state').classList.toggle('visible', markers.length === 0);
     }
 
     function placeUserMarker() {
