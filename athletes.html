@@ -129,6 +129,82 @@
         padding: 5px 10px;
       }
     }
+
+    /* Playdate request confirmation modal */
+    #playdate-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: rgba(0,0,0,0.45);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #playdate-modal.visible { display: flex; }
+    .modal-card {
+      background: white;
+      border-radius: 24px;
+      padding: 40px 32px 32px;
+      text-align: center;
+      max-width: 340px;
+      width: 100%;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+      animation: modal-pop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes modal-pop {
+      from { transform: scale(0.85); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+    .modal-icon { font-size: 52px; margin-bottom: 14px; }
+    .modal-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: 22px;
+      color: #111;
+      margin: 0 0 8px;
+    }
+    .modal-athlete {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #F7567C;
+      margin: 0 0 10px;
+    }
+    .modal-msg {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px;
+      color: #888;
+      line-height: 1.6;
+      margin: 0 0 26px;
+    }
+    .modal-actions { display: flex; gap: 10px; justify-content: center; }
+    .modal-close {
+      flex: 1;
+      background: #F7567C;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 11px 20px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .modal-close:hover { background: #e04570; }
+    .modal-notif {
+      flex: 1;
+      background: white;
+      color: #F7567C;
+      border: 1.5px solid #F7567C;
+      border-radius: 20px;
+      padding: 11px 20px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .modal-notif:hover { background: #fff0f4; }
   </style>
 </head>
 <body style="padding-top: 0; text-align: left;">
@@ -141,6 +217,8 @@
     <div class="nav-links" id="nav-links">
         <a href="index.html">Home</a>
         <a href="about.html">About</a>
+        <a href="athletes.html">Find Athletes</a>
+        <a href="notifications.html">Notifications</a>
         <a href="signup.html">Sign Up</a>
         <a href="profile.html" class="profile-icon">👤</a>
     </div>
@@ -185,9 +263,42 @@
     </div>
   </div>
 
+  <!-- Playdate request confirmation modal -->
+  <div id="playdate-modal">
+    <div class="modal-card">
+      <div class="modal-icon">🎉</div>
+      <div class="modal-title">Playdate Request Sent!</div>
+      <div class="modal-athlete" id="modal-athlete-name"></div>
+      <p class="modal-msg">We'll let you know when they respond.</p>
+      <div class="modal-actions">
+        <button class="modal-close" onclick="closeModal()">Done</button>
+        <button class="modal-notif" onclick="window.location.href='notifications.html'">View Requests</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const athletes = [];
+    const athletes = [
+      // ~1–5 miles from Vero Beach center
+      { name: "Marcus Rivera",    sport: "Tennis",     skill: "Bring it on",    lat: 27.6510, lng: -80.3770 },
+      { name: "Priya Nair",       sport: "Running",    skill: "Just for laughs",lat: 27.5950, lng: -80.3970 },
+      { name: "Jake Thompson",    sport: "Pickleball", skill: "Friendly match", lat: 27.6400, lng: -80.4210 },
+      { name: "Sofia Delgado",    sport: "Soccer",     skill: "Friendly match", lat: 27.6650, lng: -80.4370 },
+      { name: "Carlos Webb",      sport: "Basketball", skill: "Bring it on",    lat: 27.6060, lng: -80.3680 },
+      // ~6–13 miles from Vero Beach center
+      { name: "Aisha Brooks",     sport: "Cycling",    skill: "Just for laughs",lat: 27.7410, lng: -80.4000 },
+      { name: "Derek Fontaine",   sport: "Tennis",     skill: "Friendly match", lat: 27.5830, lng: -80.4840 },
+      { name: "Lena Kowalski",    sport: "Running",    skill: "Bring it on",    lat: 27.7380, lng: -80.3300 },
+      { name: "Omar Castillo",    sport: "Pickleball", skill: "Just for laughs",lat: 27.4800, lng: -80.3920 },
+      { name: "Natalie Cruz",     sport: "Soccer",     skill: "Bring it on",    lat: 27.7270, lng: -80.4910 },
+      { name: "Ryan Okafor",      sport: "Basketball", skill: "Friendly match", lat: 27.5730, lng: -80.3430 },
+      { name: "Jade Mercado",     sport: "Cycling",    skill: "Bring it on",    lat: 27.8270, lng: -80.3850 },
+      // ~18–22 miles from Vero Beach center
+      { name: "Tyler Nguyen",     sport: "Running",    skill: "Just for laughs",lat: 27.3770, lng: -80.4280 },
+      { name: "Simone Hardy",     sport: "Basketball", skill: "Just for laughs",lat: 27.8750, lng: -80.5650 },
+      { name: "Leo Papadopoulos", sport: "Pickleball", skill: "Friendly match", lat: 27.9570, lng: -80.3730 },
+    ];
 
     const sportColors = {
       Tennis: "#F7567C",
@@ -198,8 +309,8 @@
       Cycling: "#00B2A9"
     };
 
-    let userLat = 25.7617;
-    let userLng = -80.1918;
+    let userLat = 27.6386;
+    let userLng = -80.3973;
 
     const map = L.map('map').setView([userLat, userLng], 13);
 
@@ -259,7 +370,7 @@
               <div class="popup-sport">${a.sport}</div>
               <div><span class="popup-vibe">${a.skill}</span></div>
               <div class="popup-meta">${dist.toFixed(1)} miles away</div>
-              <button class="popup-btn" onclick="window.location.href='signup.html'">Schedule a Playdate ↗</button>
+              <button class="popup-btn" onclick="requestPlaydate(${JSON.stringify(a.name)}, ${JSON.stringify(a.sport)})">Schedule a Playdate</button>
             `);
           markers.push(marker);
         }
@@ -298,6 +409,28 @@
     document.getElementById('filter-sport').addEventListener('change', renderMarkers);
     document.getElementById('filter-distance').addEventListener('change', renderMarkers);
     document.getElementById('filter-skill').addEventListener('change', renderMarkers);
+
+    function requestPlaydate(name, sport) {
+      const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      let requests = [];
+      try {
+        const parsed = JSON.parse(localStorage.getItem('playdateRequests') || '[]');
+        requests = Array.isArray(parsed) ? parsed : [];
+      } catch (e) {}
+      requests.push({ name, sport, date: today, status: 'pending' });
+      localStorage.setItem('playdateRequests', JSON.stringify(requests));
+      document.getElementById('modal-athlete-name').textContent = name;
+      document.getElementById('playdate-modal').classList.add('visible');
+      map.closePopup();
+    }
+
+    function closeModal() {
+      document.getElementById('playdate-modal').classList.remove('visible');
+    }
+
+    document.getElementById('playdate-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
   </script>
 </body>
 </html>
