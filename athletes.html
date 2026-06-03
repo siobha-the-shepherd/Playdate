@@ -218,10 +218,11 @@
         <a href="index.html">Home</a>
         <a href="athletes.html">Find Athletes</a>
         <a href="notifications.html">Notifications</a>
-        <a href="signup.html">Sign Up</a>
+        <a href="signup.html" id="nav-signup">Sign Up</a>
         <a href="profile.html" class="profile-icon">👤</a>
     </div>
   </nav>
+  <script>if(localStorage.getItem('playdateUser')){document.getElementById('nav-signup').style.display='none';}</script>
 
   <div id="location-banner">📍 Using your location to find nearby athletes</div>
 

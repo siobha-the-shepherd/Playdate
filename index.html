@@ -5,106 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Playdate</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        .mission {
-            font-family: 'Fraunces', serif;
-            font-weight: 600;
-            font-size: 22px;
-            color: #000;
-            background: #ffffff;
-            display: inline-block;
-            padding: 16px 32px;
-            border-radius: 30px;
-            line-height: 1.6;
-            max-width: 560px;
-            margin: 50px auto 0;
-            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            z-index: 1;
-            cursor: default;
+        /* ── Hero overrides ─────────────────────────────────────────── */
+        body {
+            padding-top: 120px;
         }
 
-        .mission:hover {
-            transform: scale(1.03);
-            box-shadow: 0 10px 40px rgba(0, 178, 169, 0.4), 0 4px 16px rgba(247, 86, 124, 0.2);
+        h1 {
+            font-size: 88px;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 22px;
         }
 
-        .how-title {
-            font-family: 'Pacifico', cursive;
-            font-size: 32px;
-            color: #ffffff;
-            margin: 50px 0 30px;
-            position: relative;
-            z-index: 1;
+        .tagline {
+            font-size: 28px;
+            padding: 12px 30px;
+            box-shadow: 0 4px 20px rgba(0, 178, 169, 0.28);
         }
 
-        .steps {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            padding: 0 40px 80px;
-            flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
+        /* Coral-orange CTA — scoped to .hero-cta so hamburger is unaffected */
+        .hero-cta {
+            background: #FE5733;
+            padding: 18px 52px;
+            letter-spacing: 0.4px;
+            margin: 36px auto 80px;
+            box-shadow: 0 8px 28px rgba(254, 87, 51, 0.38);
+            transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+        }
+        .hero-cta:hover {
+            background: #e8481f;
+            box-shadow: 0 14px 36px rgba(254, 87, 51, 0.48);
+            transform: translateY(-2px);
         }
 
-        .step {
-            background: white;
-            border-radius: 15px;
-            padding: 30px 24px;
-            width: 220px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .step-num {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: #F7567C;
-            color: white;
-            font-weight: 700;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 14px;
-        }
-
-        .step h3 {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            color: #111;
-            margin-bottom: 8px;
-        }
-
-        .step p {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.5;
-        }
-
+        /* ── Wave divider ───────────────────────────────────────────── */
         .wave-divider {
             display: block;
             line-height: 0;
             margin-bottom: -1px;
         }
-
         .wave-divider svg {
             display: block;
             width: 100%;
             height: 90px;
         }
 
+        /* ── Bottom teal section ────────────────────────────────────── */
         .bottom-section {
             background: #00B2A9;
             position: relative;
             overflow: hidden;
             padding-top: 20px;
         }
-
         .teal-bg-pattern {
             position: absolute;
             top: 0;
@@ -114,38 +68,130 @@
             pointer-events: none;
         }
 
+        /* ── Mission oval ───────────────────────────────────────────── */
+        .mission {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 22px;
+            color: #111;
+            background: #ffffff;
+            display: inline-block;
+            padding: 22px 44px;
+            border-radius: 40px;
+            line-height: 1.7;
+            max-width: 580px;
+            margin: 64px auto 0;
+            box-shadow: 0 8px 36px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1;
+            cursor: default;
+        }
+        .mission:hover {
+            transform: scale(1.03);
+            box-shadow: 0 14px 52px rgba(0, 178, 169, 0.38), 0 4px 16px rgba(247, 86, 124, 0.18);
+        }
+
+        /* ── Tricolor section divider ───────────────────────────────── */
+        .section-divider {
+            width: 52px;
+            height: 3px;
+            background: linear-gradient(90deg, #F7567C 0%, #FE5733 50%, #00C9BF 100%);
+            border-radius: 2px;
+            margin: 56px auto 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── "How it works" heading ─────────────────────────────────── */
+        .how-title {
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 40px;
+            color: #ffffff;
+            margin: 32px 0 52px;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Step cards ─────────────────────────────────────────────── */
+        .steps {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            padding: 0 40px 108px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step {
+            background: white;
+            border-radius: 20px;
+            padding: 36px 28px;
+            width: 220px;
+            text-align: center;
+            box-shadow: 0 8px 36px rgba(0,0,0,0.11);
+        }
+
+        .step-num {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #F7567C;
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+        }
+
+        .step h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 10px;
+            line-height: 1.35;
+        }
+
+        .step p {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            color: #555;
+            line-height: 1.65;
+        }
+
+        /* ── Responsive ─────────────────────────────────────────────── */
         @media (max-width: 768px) {
-            button {
-                padding: 12px 30px;
-                font-size: 16px;
-            }
+            body { padding-top: 72px; }
 
-            .mission {
-                font-size: 18px;
-                padding: 12px 20px;
-                margin-top: 40px;
-            }
+            h1 { font-size: 54px; letter-spacing: -1px; margin-bottom: 16px; }
 
-            .how-title {
-                font-size: 26px;
-                margin: 36px 0 20px;
-            }
+            .tagline { font-size: 20px; padding: 10px 22px; }
+
+            .hero-cta { padding: 14px 36px; font-size: 16px; margin: 28px auto 56px; }
+
+            .mission { font-size: 18px; padding: 18px 24px; margin-top: 44px; border-radius: 28px; }
+
+            .section-divider { margin-top: 44px; }
+
+            .how-title { font-size: 30px; margin: 28px 0 36px; }
 
             .steps {
                 flex-direction: column;
                 align-items: center;
-                padding: 0 20px 60px;
+                padding: 0 20px 72px;
                 gap: 16px;
             }
 
-            .step {
-                width: 100%;
-                max-width: 340px;
-            }
+            .step { width: 100%; max-width: 340px; }
 
-            .wave-divider svg {
-                height: 60px;
-            }
+            .wave-divider svg { height: 60px; }
         }
     </style>
 </head>
@@ -159,13 +205,14 @@
             <a href="index.html">Home</a>
             <a href="athletes.html">Find Athletes</a>
             <a href="notifications.html">Notifications</a>
-            <a href="signup.html">Sign Up</a>
+            <a href="signup.html" id="nav-signup">Sign Up</a>
             <a href="profile.html" class="profile-icon">👤</a>
         </div>
     </nav>
+    <script>if(localStorage.getItem('playdateUser')){document.getElementById('nav-signup').style.display='none';}</script>
     <h1>Playdate</h1>
     <p class="tagline">The game needs you.</p>
-    <button onclick="window.location.href='athletes.html'">Find Your Game ↗</button>
+    <button class="hero-cta" onclick="window.location.href='athletes.html'">Find Your Game ↗</button>
 
     <div class="wave-divider">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 90" preserveAspectRatio="none">
@@ -193,6 +240,8 @@
 
         <p class="mission">Sports are better with others. Playdate helps you find athletes in your city who share your sport, your schedule, and your drive to get out and play.</p>
 
+        <div class="section-divider" aria-hidden="true"></div>
+
         <div class="how-title">How it works</div>
 
         <div class="steps">
@@ -202,12 +251,12 @@
                 <p>Complete your Player Card so the right athletes can find you.</p>
             </div>
             <div class="step">
-                <div class="step-num">2</div>
+                <div class="step-num" style="background:#FE5733">2</div>
                 <h3>Connect with athletes in your community</h3>
                 <p>Browse the map and find athletes near you.</p>
             </div>
             <div class="step">
-                <div class="step-num">3</div>
+                <div class="step-num" style="background:#00C9BF">3</div>
                 <h3>Schedule a Playdate</h3>
                 <p>Pick a time, send an invite, and show up to play.</p>
             </div>

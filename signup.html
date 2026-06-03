@@ -291,31 +291,34 @@
         .card-back-face { transform: rotateY(180deg); }
         .card-inner-frame { display: flex; flex-direction: column; height: 100%; border: 1.5px solid #111; box-sizing: border-box; }
 
-        .f-top { background: #F7567C; padding: 3px 8px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #111; }
+        /* ---- Card front: 1952 Topps portrait layout ---- */
+        .f-top { background: #F7567C; padding: 3px 8px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #111; flex-shrink: 0; }
         .f-top .brand { font-size: 8px; font-weight: 900; color: white; letter-spacing: 2px; }
         .f-top .year { font-size: 8px; font-weight: 900; color: white; }
         .f-photo {
-            width: 100%; flex: 1;
-            display: flex; align-items: flex-end; justify-content: center;
+            width: 100%; flex: none; height: 150px;
+            display: flex; align-items: center; justify-content: center;
             position: relative; overflow: hidden;
             background: #00B2A9; border-bottom: 1.5px solid #111;
         }
-        .avatar-display { font-size: 90px; line-height: 1; margin-bottom: -6px; }
+        .avatar-display { font-size: 72px; line-height: 1; }
         .photo-display {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             display: none;
             position: absolute; top: 0; left: 0;
         }
         .rc-flag { position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 44px 44px 0; border-color: transparent #F7567C transparent transparent; }
         .rc-text { position: absolute; top: 4px; right: 4px; color: white; font-size: 7px; font-weight: 900; letter-spacing: 1px; }
-        .f-name-band { background: #111; display: flex; align-items: stretch; min-height: 38px; border-bottom: 1.5px solid #111; }
+        .f-name-band { background: #111; display: flex; align-items: stretch; flex: 1; min-height: 60px; border-bottom: 1.5px solid #111; }
         .f-stripe-l { background: #F7567C; width: 7px; flex-shrink: 0; }
         .f-stripe-r { background: #00B2A9; width: 7px; flex-shrink: 0; }
-        .f-name-content { padding: 5px 8px; flex: 1; }
+        .f-name-content { padding: 8px 8px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
         .f-name { color: white; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.1; }
+        .f-sport { color: #00B2A9; font-size: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
         .f-city { color: #F7567C; font-size: 7px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
-        .f-bottom { background: #111; padding: 3px 8px; display: flex; justify-content: space-between; }
+        .f-bottom { background: #111; padding: 3px 8px; display: flex; justify-content: space-between; flex-shrink: 0; }
         .f-bottom .set { font-size: 7px; color: #555; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; }
         .f-bottom .num { font-size: 7px; color: #F7567C; font-weight: 900; letter-spacing: 1px; }
 
@@ -360,15 +363,16 @@
             <a href="index.html">Home</a>
             <a href="athletes.html">Find Athletes</a>
             <a href="notifications.html">Notifications</a>
-            <a href="signup.html">Sign Up</a>
+            <a href="signup.html" id="nav-signup">Sign Up</a>
             <a href="profile.html" class="profile-icon">👤</a>
         </div>
     </nav>
+    <script>if(localStorage.getItem('playdateUser')){document.getElementById('nav-signup').style.display='none';}</script>
 
     <div class="content">
 
         <div class="form-side">
-            <h1>Build Your Card</h1>
+            <h1 id="form-heading">Build Your Card</h1>
             <p class="subtitle">Every legend starts as a rookie.</p>
 
             <div class="field">
@@ -502,6 +506,7 @@
                                 <div class="f-stripe-l"></div>
                                 <div class="f-name-content">
                                     <div class="f-name" id="card-name">YOUR NAME</div>
+                                    <div class="f-sport" id="card-sport"></div>
                                     <div class="f-city" id="card-city">📍 YOUR CITY</div>
                                 </div>
                                 <div class="f-stripe-r"></div>
@@ -627,6 +632,7 @@
 
         function updateSportsOnCard() {
             const selected = Array.from(document.querySelectorAll('.sport-tag.selected')).map(t => t.textContent);
+            document.getElementById('card-sport').textContent = selected.length > 0 ? selected[0].toUpperCase() : '';
             const container = document.getElementById('card-sports');
             container.innerHTML = '';
             selected.forEach(s => {
@@ -698,6 +704,9 @@
             var u;
             try { u = JSON.parse(raw); } catch (e) { return; }
             if (!u) return;
+
+            document.getElementById('form-heading').textContent = 'Edit Profile';
+            document.title = 'Playdate — Edit Profile';
 
             if (u.name) document.getElementById('input-name').value = u.name;
             if (u.city) document.getElementById('input-city').value = u.city;
