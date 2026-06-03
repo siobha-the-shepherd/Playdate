@@ -11,20 +11,32 @@
             font-weight: 600;
             font-size: 22px;
             color: #000;
-            background: #f5ede0;
+            background: #ffffff;
             display: inline-block;
-            padding: 12px 28px;
+            padding: 16px 32px;
             border-radius: 30px;
             line-height: 1.6;
             max-width: 560px;
-            margin: 60px auto 0;
+            margin: 50px auto 0;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1;
+            cursor: default;
+        }
+
+        .mission:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 40px rgba(0, 178, 169, 0.4), 0 4px 16px rgba(247, 86, 124, 0.2);
         }
 
         .how-title {
             font-family: 'Pacifico', cursive;
             font-size: 32px;
-            color: #000;
+            color: #ffffff;
             margin: 50px 0 30px;
+            position: relative;
+            z-index: 1;
         }
 
         .steps {
@@ -33,6 +45,8 @@
             gap: 30px;
             padding: 0 40px 80px;
             flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
         }
 
         .step {
@@ -72,6 +86,34 @@
             line-height: 1.5;
         }
 
+        .wave-divider {
+            display: block;
+            line-height: 0;
+            margin-bottom: -1px;
+        }
+
+        .wave-divider svg {
+            display: block;
+            width: 100%;
+            height: 90px;
+        }
+
+        .bottom-section {
+            background: #00B2A9;
+            position: relative;
+            overflow: hidden;
+            padding-top: 20px;
+        }
+
+        .teal-bg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
         @media (max-width: 768px) {
             button {
                 padding: 12px 30px;
@@ -80,7 +122,7 @@
 
             .mission {
                 font-size: 18px;
-                padding: 10px 20px;
+                padding: 12px 20px;
                 margin-top: 40px;
             }
 
@@ -99,6 +141,10 @@
             .step {
                 width: 100%;
                 max-width: 340px;
+            }
+
+            .wave-divider svg {
+                height: 60px;
             }
         }
     </style>
@@ -120,41 +166,52 @@
     <h1>Playdate</h1>
     <p class="tagline">The game needs you.</p>
     <button onclick="window.location.href='athletes.html'">Find Your Game ↗</button>
-    <div class="features">
-        <div class="feature">
-            <h2>Find Athletes Near You</h2>
-            <p>Discover people in your area who share your sport and skill level.</p>
-        </div>
-        <div class="feature">
-            <h2>Schedule a Playdate</h2>
-            <p>Set up a meetup in minutes and get active with someone new.</p>
-        </div>
-        <div class="feature">
-            <h2>Build Your Community</h2>
-            <p>Share your playdates, follow athletes, and grow your local sports network.</p>
-        </div>
+
+    <div class="wave-divider">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 90" preserveAspectRatio="none">
+            <path fill="#00B2A9" d="M0,50 Q360,10 720,50 Q1080,90 1440,50 L1440,90 L0,90 Z"/>
+        </svg>
     </div>
 
-    <p class="mission">Sports are better with others. Playdate helps you find athletes in your city who share your sport, your schedule, and your drive to get out and play.</p>
+    <section class="bottom-section">
+        <svg class="teal-bg-pattern" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <circle cx="110" cy="120" r="120" fill="#00C9BF" opacity="0.22"/>
+            <circle cx="1330" cy="560" r="180" fill="#009E96" opacity="0.18"/>
+            <circle cx="720" cy="680" r="100" fill="#00C9BF" opacity="0.15"/>
+            <path d="M-60,120 Q280,40 600,160 Q920,280 1260,120 Q1420,60 1500,160" fill="none" stroke="#00C9BF" stroke-width="3" opacity="0.28"/>
+            <path d="M-60,280 Q200,400 520,260 Q840,120 1140,300 Q1320,400 1500,320" fill="none" stroke="#009E96" stroke-width="2.5" opacity="0.22"/>
+            <path d="M-60,500 Q300,600 620,460 Q940,320 1260,520 Q1380,580 1500,540" fill="none" stroke="#00C9BF" stroke-width="2" opacity="0.18"/>
+            <circle cx="310" cy="480" r="18" fill="#00C9BF" opacity="0.35"/>
+            <circle cx="890" cy="160" r="12" fill="#009E96" opacity="0.3"/>
+            <circle cx="1120" cy="360" r="22" fill="#00C9BF" opacity="0.28"/>
+            <circle cx="550" cy="720" r="14" fill="#009E96" opacity="0.35"/>
+            <circle cx="210" cy="640" r="8" fill="#00C9BF" opacity="0.4"/>
+            <circle cx="1240" cy="200" r="10" fill="#009E96" opacity="0.38"/>
+            <path d="M1280,60 Q1340,20 1390,70 Q1440,120 1400,165 Q1350,210 1290,175 Q1230,140 1280,60Z" fill="#009E96" opacity="0.18"/>
+            <path d="M60,580 Q110,530 165,565 Q220,600 205,660 Q190,720 130,710 Q60,700 45,640 Q30,580 60,580Z" fill="#00C9BF" opacity="0.22"/>
+        </svg>
 
-    <div class="how-title">How it works</div>
+        <p class="mission">Sports are better with others. Playdate helps you find athletes in your city who share your sport, your schedule, and your drive to get out and play.</p>
 
-    <div class="steps">
-        <div class="step">
-            <div class="step-num">1</div>
-            <h3>Create your profile</h3>
-            <p>Complete your Player Card so the right athletes can find you.</p>
+        <div class="how-title">How it works</div>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <h3>Create your profile</h3>
+                <p>Complete your Player Card so the right athletes can find you.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <h3>Connect with athletes in your community</h3>
+                <p>Browse the map and find athletes near you.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <h3>Schedule a Playdate</h3>
+                <p>Pick a time, send an invite, and show up to play.</p>
+            </div>
         </div>
-        <div class="step">
-            <div class="step-num">2</div>
-            <h3>Connect with athletes in your community</h3>
-            <p>Browse the map and find athletes near you.</p>
-        </div>
-        <div class="step">
-            <div class="step-num">3</div>
-            <h3>Schedule a Playdate</h3>
-            <p>Pick a time, send an invite, and show up to play.</p>
-        </div>
-    </div>
+    </section>
 </body>
 </html>
