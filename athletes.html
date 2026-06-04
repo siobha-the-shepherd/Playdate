@@ -496,6 +496,38 @@
     }
     .modal-notif:hover { background: #fff0f4; }
 
+    /* ── User popup styles ─────────────────────────────────────────── */
+    .pcard-head-you { background: linear-gradient(135deg, #00B2A9 0%, #009E96 100%); }
+
+    .pcard-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .pcard-pill {
+      background: rgba(255,255,255,0.20);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.30);
+      border-radius: 12px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 7px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .pcard-you {
+      background: rgba(255,255,255,0.25);
+      color: white;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
     /* ── Zoom control shift when drawer is open ─────────────────────── */
     .leaflet-top.leaflet-left {
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -680,6 +712,16 @@
       attribution: '© OpenStreetMap contributors © CARTO'
     }).addTo(map);
 
+    // Read signed-up user profile once at load time
+    var profileUser = null;
+    try {
+      var _raw = localStorage.getItem('playdateUser');
+      if (_raw) {
+        var _parsed = JSON.parse(_raw);
+        if (_parsed && typeof _parsed === 'object' && !Array.isArray(_parsed)) profileUser = _parsed;
+      }
+    } catch(e) {}
+
     let markers = [];
     let userMarker = null;
 
@@ -747,14 +789,52 @@
 
     function placeUserMarker() {
       if (userMarker) map.removeLayer(userMarker);
-      userMarker = L.marker([userLat, userLng], { icon: makeUserIcon() })
-        .addTo(map)
-        .bindPopup("📍 You are here");
+
+      if (profileUser) {
+        var sports = Array.isArray(profileUser.sports)
+          ? profileUser.sports.filter(function(s) { return typeof s === 'string'; })
+          : [];
+        var primarySport = sports[0] || '';
+        var sportsHTML = sports.length > 0
+          ? '<div class="pcard-pills">' + sports.map(function(s) {
+              return '<span class="pcard-pill">' + s.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</span>';
+            }).join('') + '</div>'
+          : '';
+        var vibe = typeof profileUser.vibe === 'string' ? profileUser.vibe : '';
+        var skill = typeof profileUser.skillLevel === 'string' ? profileUser.skillLevel : '';
+        var vibeOrSkill = vibe || skill;
+        var vibeHTML = vibeOrSkill
+          ? '<span class="pcard-vibe">' + vibeOrSkill.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</span>'
+          : '';
+        var safeName = (typeof profileUser.name === 'string' && profileUser.name
+          ? profileUser.name : 'Athlete').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+        userMarker = L.marker([userLat, userLng], { icon: makeIcon(primarySport) })
+          .addTo(map)
+          .bindPopup(
+            '<div class="pcard-head pcard-head-you">' +
+              '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;">' +
+                '<div class="pcard-name">' + safeName + '</div>' +
+                '<span class="pcard-you">You</span>' +
+              '</div>' +
+              sportsHTML +
+            '</div>' +
+            '<div class="pcard-body">' +
+              vibeHTML +
+              '<div class="pcard-dist">📍 Your location</div>' +
+            '</div>',
+            { className: 'custom-popup', maxWidth: 240 }
+          );
+      } else {
+        userMarker = L.marker([userLat, userLng], { icon: makeUserIcon() })
+          .addTo(map)
+          .bindPopup("📍 You are here");
+      }
     }
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
+        function(pos) {
           userLat = pos.coords.latitude;
           userLng = pos.coords.longitude;
           map.setView([userLat, userLng], 13);
@@ -762,13 +842,15 @@
           placeUserMarker();
           renderMarkers();
         },
-        () => {
-          placeUserMarker();
+        function() {
+          // Geolocation denied — only show blue dot for anonymous (no-profile) users
+          if (!profileUser) placeUserMarker();
           renderMarkers();
         }
       );
     } else {
-      placeUserMarker();
+      // No geolocation API — same as denied
+      if (!profileUser) placeUserMarker();
       renderMarkers();
     }
 
