@@ -142,10 +142,16 @@
 
         /* ── Flip card ───────────────────────────────────────────────── */
         .scene {
-            width: 220px;
-            height: 330px;
-            perspective: 1000px;
+            width: 300px;
+            height: 420px;
+            perspective: 1200px;
             cursor: pointer;
+            transition: transform 0.25s ease;
+        }
+
+        @media (hover: hover) {
+            .scene:hover { transform: translateY(-8px) rotate(-0.5deg); }
+            .scene.flipped:hover { transform: translateY(-8px) rotate(0.5deg); }
         }
 
         .card-inner {
@@ -160,70 +166,200 @@
         .card-face {
             position: absolute; width: 100%; height: 100%;
             backface-visibility: hidden; -webkit-backface-visibility: hidden;
-            border-radius: 7px; overflow: hidden;
+            border-radius: 10px; overflow: hidden;
             font-family: Arial, Helvetica, sans-serif;
             background: white; box-sizing: border-box;
-            border: 10px solid #f5ede0;
-            outline: 1.5px solid #111;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.22);
+            border: 12px solid #f5ede0;
+            outline: 2px solid #111;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.30), 0 8px 24px rgba(0,0,0,0.16);
         }
 
         .card-back-face { transform: rotateY(180deg); }
 
         .card-inner-frame {
             display: flex; flex-direction: column; height: 100%;
-            border: 1.5px solid #111; box-sizing: border-box;
+            border: 2px solid #111; box-sizing: border-box;
         }
 
         /* ---- Card front ---- */
-        .f-top { background: #F7567C; padding: 3px 8px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #111; flex-shrink: 0; }
-        .f-top .brand { font-size: 8px; font-weight: 900; color: white; letter-spacing: 2px; }
-        .f-top .year { font-size: 8px; font-weight: 900; color: white; }
+        .f-top {
+            background: #F7567C;
+            padding: 5px 11px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #111; flex-shrink: 0;
+        }
+        .f-top .brand { font-size: 9px; font-weight: 900; color: white; letter-spacing: 2.5px; text-transform: uppercase; }
+        .f-top .year { font-size: 9px; font-weight: 900; color: rgba(255,255,255,0.80); }
+
         .f-photo {
-            width: 100%; flex: none; height: 165px;
+            width: 100%; flex: 1; min-height: 0;
             display: flex; align-items: center; justify-content: center;
             position: relative; overflow: hidden;
-            background: #00B2A9; border-bottom: 1.5px solid #111;
+            background: #00B2A9; border-bottom: 2px solid #111;
         }
-        .avatar-display { font-size: 80px; line-height: 1; }
+        .avatar-display { font-size: 108px; line-height: 1; }
         .photo-display { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
-        .rc-flag { position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 44px 44px 0; border-color: transparent #F7567C transparent transparent; }
-        .rc-text { position: absolute; top: 4px; right: 4px; color: white; font-size: 7px; font-weight: 900; letter-spacing: 1px; }
-        .f-name-band { background: #111; display: flex; align-items: stretch; flex: 1; min-height: 66px; border-bottom: 1.5px solid #111; }
-        .f-stripe-l { background: #F7567C; width: 7px; flex-shrink: 0; }
-        .f-stripe-r { background: #00B2A9; width: 7px; flex-shrink: 0; }
-        .f-name-content { padding: 8px 8px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        .f-name { color: white; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.1; }
-        .f-sport { color: #00B2A9; font-size: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
-        .f-city { color: #F7567C; font-size: 7px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
-        .f-bottom { background: #111; padding: 3px 8px; display: flex; justify-content: space-between; flex-shrink: 0; }
-        .f-bottom .set { font-size: 7px; color: #555; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; }
-        .f-bottom .num { font-size: 7px; color: #F7567C; font-weight: 900; letter-spacing: 1px; }
+
+        .rc-flag {
+            position: absolute; top: 0; right: 0; width: 0; height: 0;
+            border-style: solid; border-width: 0 58px 58px 0;
+            border-color: transparent #111 transparent transparent;
+        }
+        .rc-flag::after {
+            content: '';
+            position: absolute; top: 0; right: -55px;
+            width: 0; height: 0; border-style: solid;
+            border-width: 0 52px 52px 0;
+            border-color: transparent #FE5733 transparent transparent;
+        }
+        .rc-text {
+            position: absolute; top: 7px; right: 6px;
+            color: white; font-size: 8px; font-weight: 900; letter-spacing: 1px;
+            z-index: 1;
+        }
+
+        .f-name-band {
+            background: #111; display: flex; align-items: stretch;
+            flex: none; height: 76px; border-bottom: 2px solid #111;
+        }
+        .f-stripe-l { background: #F7567C; width: 10px; flex-shrink: 0; }
+        .f-stripe-r { background: #00B2A9; width: 10px; flex-shrink: 0; }
+        .f-name-content {
+            padding: 9px 11px; flex: 1;
+            display: flex; flex-direction: column; justify-content: center;
+            overflow: hidden;
+        }
+        .f-name {
+            font-family: 'Fraunces', serif;
+            color: white; font-size: 15px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: -0.2px; line-height: 1.1;
+            margin-bottom: 4px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .f-sport {
+            display: flex; flex-wrap: wrap; gap: 3px;
+            overflow: hidden; margin-bottom: 3px; max-height: 18px;
+        }
+        .f-sport-pill {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #00C9BF; color: #111;
+            font-size: 7px; font-weight: 700;
+            letter-spacing: 0.04em; text-transform: uppercase;
+            padding: 2px 5px; border-radius: 2px;
+            line-height: 1.4; white-space: nowrap;
+        }
+        .f-city {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: rgba(255,255,255,0.5); font-size: 8px; font-weight: 700;
+            letter-spacing: 1.2px; text-transform: uppercase;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .f-bottom {
+            background: #111; padding: 5px 11px;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0;
+        }
+        .f-bottom .set { font-size: 8px; color: #555; letter-spacing: 1.5px; font-weight: 700; text-transform: uppercase; }
+        .f-bottom .num { font-size: 8px; color: #F7567C; font-weight: 900; letter-spacing: 1px; }
 
         /* ---- Card back ---- */
-        .b-top { background: #111; padding: 3px 8px; display: flex; justify-content: space-between; border-bottom: 1.5px solid #111; }
-        .b-top .brand { font-size: 8px; font-weight: 900; color: #F7567C; letter-spacing: 1.5px; }
-        .b-top .num { font-size: 8px; font-weight: 900; color: #aaa; }
-        .b-accent { height: 4px; background: linear-gradient(90deg, #F7567C 50%, #00B2A9 50%); border-bottom: 1.5px solid #111; }
-        .b-body { padding: 8px 10px 36px; background: white; flex: 1; overflow: hidden; }
-        .b-name { font-size: 12px; font-weight: 900; color: #111; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1px; }
-        .b-city { font-size: 7px; color: #999; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 2px; }
-        .b-gender { font-size: 7px; font-weight: 900; color: #aaa; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 3px; }
-        .b-skill { font-size: 7px; font-weight: 700; color: #00B2A9; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
-        .b-stats { display: flex; justify-content: space-around; background: #f5f5f5; border-radius: 3px; padding: 6px 2px; margin-bottom: 8px; }
-        .b-stat { text-align: center; }
-        .b-stat-num { font-size: 16px; font-weight: 900; color: #111; line-height: 1; }
-        .b-stat-lbl { font-size: 7px; color: #999; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 2px; }
-        .b-section-lbl { font-size: 7px; font-weight: 900; color: #999; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
-        .b-sports { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 8px; }
-        .b-sport-pill { font-size: 7px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 2px 6px; border-radius: 2px; background: #111; color: white; }
-        .b-divider { border: none; border-top: 1px solid #eee; margin: 6px 0; }
-        .b-vibe { font-size: 8px; color: #555; margin-bottom: 6px; }
+        .b-top {
+            background: #111; padding: 5px 11px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #111; flex-shrink: 0;
+        }
+        .b-top .brand {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 9px; font-weight: 900; color: #F7567C; letter-spacing: 2px; text-transform: uppercase;
+        }
+        .b-top .num { font-size: 9px; font-weight: 900; color: #555; }
+
+        .b-accent { height: 6px; background: linear-gradient(90deg, #F7567C 50%, #00B2A9 50%); border-bottom: 2px solid #111; flex-shrink: 0; }
+
+        .b-body {
+            padding: 13px 14px 40px;
+            background: #f5ede0; flex: 1; overflow: hidden;
+        }
+
+        .b-name {
+            font-family: 'Fraunces', serif;
+            font-size: 15px; font-weight: 700; color: #111;
+            text-transform: uppercase; letter-spacing: 0.3px;
+            margin-bottom: 2px; line-height: 1.1;
+        }
+        .b-city {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 9px; color: #888; text-transform: uppercase;
+            letter-spacing: 1.5px; font-weight: 700; margin-bottom: 2px;
+        }
+        .b-gender {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 9px; font-weight: 700; color: #aaa;
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;
+        }
+        .b-skill {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 9px; font-weight: 700; color: #00B2A9;
+            text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;
+        }
+
+        .b-stats {
+            display: flex; margin-bottom: 10px;
+            border: 1.5px solid #c8bfaf; border-radius: 5px;
+            overflow: hidden; background: white;
+        }
+        .b-stat { text-align: center; flex: 1; padding: 8px 4px; }
+        .b-stat + .b-stat { border-left: 1.5px solid #c8bfaf; }
+        .b-stat-num {
+            font-family: 'Fraunces', serif;
+            font-size: 19px; font-weight: 700; color: #111; line-height: 1;
+        }
+        .b-stat-lbl {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 7px; color: #999; text-transform: uppercase;
+            letter-spacing: 0.8px; margin-top: 3px; font-weight: 700;
+        }
+
+        .b-section-lbl {
+            font-family: 'Fraunces', serif;
+            font-size: 8px; font-weight: 700; color: #999;
+            text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 5px;
+        }
+        .b-sports { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+        .b-sport-pill {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 8px; font-weight: 700; letter-spacing: 0.8px;
+            text-transform: uppercase; padding: 3px 8px;
+            border-radius: 3px; background: #111; color: white;
+        }
+
+        .b-divider { border: none; border-top: 1.5px solid #c8bfaf; margin: 8px 0; }
+        .b-vibe {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 9px; color: #666; margin-bottom: 6px;
+        }
         .b-vibe span { font-weight: 700; color: #F7567C; }
-        .b-bio { font-size: 8px; color: #666; font-style: italic; line-height: 1.5; border-left: 2px solid #F7567C; padding-left: 6px; }
-        .b-bottom { background: #F7567C; padding: 3px 8px; display: flex; justify-content: space-between; align-items: center; position: absolute; bottom: 0; left: 0; right: 0; border-top: 1.5px solid #111; }
-        .b-bottom .series { font-size: 7px; color: white; letter-spacing: 1.5px; font-weight: 700; text-transform: uppercase; }
-        .b-bottom .copy { font-size: 7px; color: rgba(255,255,255,0.6); }
+        .b-bio {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 9px; color: #666; font-style: italic;
+            line-height: 1.6; border-left: 2.5px solid #F7567C; padding-left: 8px;
+        }
+
+        .b-bottom {
+            background: #111; padding: 5px 11px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: absolute; bottom: 0; left: 0; right: 0;
+            border-top: 2px solid #111;
+        }
+        .b-bottom .series {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 8px; color: white; letter-spacing: 1.5px; font-weight: 700; text-transform: uppercase;
+        }
+        .b-bottom .copy {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 8px; color: rgba(255,255,255,0.5);
+        }
 
         .flip-hint {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -499,11 +635,19 @@
             .profile-wrap { padding: 0 16px 44px; }
             .profile-hero { margin: 0 -16px 32px; width: calc(100% + 32px); padding: 28px 20px 24px; }
             .profile-hero-name { font-size: 24px; }
-            .card-showcase { padding: 28px 20px 24px; border-radius: 24px; }
+            .card-showcase { padding: 28px 16px 24px; border-radius: 24px; }
             .info-card { padding: 24px 20px 22px; }
             .no-profile-card { padding: 40px 24px; }
             .request-card { flex-direction: column; gap: 10px; }
             .status-badge { align-self: flex-start; }
+        }
+
+        @media (max-width: 380px) {
+            .scene {
+                transform-origin: top center;
+                transform: scale(0.88);
+                margin-bottom: -51px;
+            }
         }
     </style>
 </head>
@@ -753,11 +897,16 @@
                 document.getElementById('card-avatar').textContent = u.avatar || '🏃';
             }
 
-            // Primary sport on card front
+            // All sports as pills on card front
             var sports = Array.isArray(u.sports) ? u.sports : [];
-            if (sports.length > 0) {
-                document.getElementById('card-sport').textContent = sports[0].toUpperCase();
-            }
+            var cardSportEl = document.getElementById('card-sport');
+            cardSportEl.innerHTML = '';
+            sports.forEach(function(s) {
+                var pill = document.createElement('span');
+                pill.className = 'f-sport-pill';
+                pill.textContent = s;
+                cardSportEl.appendChild(pill);
+            });
 
             // Card back
             document.getElementById('card-name-back').textContent = u.name ? u.name.toUpperCase() : 'YOUR NAME';
