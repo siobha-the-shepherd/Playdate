@@ -900,7 +900,7 @@
 
     /* ── Playdate modal ──────────────────────────────────────────────── */
     function requestPlaydate(name, sport) {
-      const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const today = new Date().toISOString();
       let requests = [];
       try {
         const parsed = JSON.parse(localStorage.getItem('playdateRequests') || '[]');
