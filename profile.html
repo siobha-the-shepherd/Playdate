@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Playdate — My Profile</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fraunces:wght@600&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background: #fdf8f2;
+            background: #f7f8fa;
             padding-top: 55px;
         }
 
-        /* ---- No-profile state ---- */
+        /* ── No-profile state ────────────────────────────────────────── */
         .no-profile {
             display: flex;
             justify-content: center;
@@ -23,28 +23,30 @@
 
         .no-profile-card {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-            padding: 48px 40px;
+            border-radius: 28px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+            padding: 56px 44px;
             text-align: center;
             max-width: 380px;
             width: 100%;
         }
 
-        .no-profile-icon { font-size: 56px; margin-bottom: 16px; }
+        .no-profile-icon { font-size: 60px; margin-bottom: 20px; display: block; }
 
         .no-profile-card h2 {
-            font-family: 'Pacifico', cursive;
-            font-size: 26px;
-            color: #000;
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 28px;
+            color: #111;
             margin-bottom: 12px;
+            letter-spacing: -0.3px;
         }
 
         .no-profile-card p {
             font-size: 15px;
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 28px;
+            color: #888;
+            line-height: 1.65;
+            margin-bottom: 32px;
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
@@ -52,74 +54,142 @@
             background: #F7567C;
             color: white;
             border: none;
-            padding: 13px 32px;
+            padding: 14px 36px;
             border-radius: 30px;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 15px;
             cursor: pointer;
             margin: 0;
             width: auto;
             display: inline-block;
+            box-shadow: 0 6px 22px rgba(247,86,124,0.38);
+            transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
         }
-        .no-profile-card button:hover { background: #e04570; }
+        .no-profile-card button:hover {
+            background: #e04570;
+            box-shadow: 0 10px 30px rgba(247,86,124,0.45);
+            transform: translateY(-2px);
+        }
 
-        /* ---- Profile state ---- */
+        /* ── Profile state ───────────────────────────────────────────── */
         .profile-wrap {
             display: none;
-            max-width: 520px;
+            max-width: 540px;
             margin: 0 auto;
-            padding: 40px 20px 60px;
+            padding: 0 20px 64px;
             flex-direction: column;
             align-items: center;
-            gap: 28px;
+            gap: 0;
         }
         .profile-wrap.visible { display: flex; }
 
-        .welcome {
-            font-family: 'Fraunces', serif;
-            font-weight: 600;
-            font-size: 20px;
-            color: #00B2A9;
+        /* ── Profile hero ────────────────────────────────────────────── */
+        .profile-hero {
+            background: white;
+            border-bottom: 1.5px solid #f0f0f0;
+            padding: 36px 24px 30px;
             text-align: center;
+            width: 100%;
+            margin: 0 -20px 40px;
+            width: calc(100% + 40px);
+            align-self: stretch;
         }
 
-        /* ---- Flip card ---- */
-        .scene { width: 200px; height: 300px; perspective: 900px; cursor: pointer; }
+        .hero-pip-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .hero-pip { width: 7px; height: 7px; border-radius: 50%; }
+
+        .profile-hero-name {
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 30px;
+            color: #111;
+            letter-spacing: -0.4px;
+            margin: 0 0 8px;
+            line-height: 1.15;
+        }
+
+        .profile-hero-sub {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: #bbb;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+        }
+
+        /* ── Card showcase ───────────────────────────────────────────── */
+        .card-showcase {
+            background: linear-gradient(150deg, #fff0f5 0%, #e8f9f8 100%);
+            border-radius: 32px;
+            padding: 36px 28px 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+            margin-bottom: 28px;
+        }
+
+        /* ── Flip card ───────────────────────────────────────────────── */
+        .scene {
+            width: 220px;
+            height: 330px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
         .card-inner {
             width: 100%; height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
         }
+
         .scene.flipped .card-inner { transform: rotateY(180deg); }
+
         .card-face {
             position: absolute; width: 100%; height: 100%;
             backface-visibility: hidden; -webkit-backface-visibility: hidden;
-            border-radius: 6px; overflow: hidden;
+            border-radius: 7px; overflow: hidden;
             font-family: Arial, Helvetica, sans-serif;
             background: white; box-sizing: border-box;
-            border: 9px solid #f5ede0;
+            border: 10px solid #f5ede0;
             outline: 1.5px solid #111;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.22);
         }
-        .card-back-face { transform: rotateY(180deg); }
-        .card-inner-frame { display: flex; flex-direction: column; height: 100%; border: 1.5px solid #111; box-sizing: border-box; }
 
-        /* ---- Card front: 1952 Topps portrait layout ---- */
+        .card-back-face { transform: rotateY(180deg); }
+
+        .card-inner-frame {
+            display: flex; flex-direction: column; height: 100%;
+            border: 1.5px solid #111; box-sizing: border-box;
+        }
+
+        /* ---- Card front ---- */
         .f-top { background: #F7567C; padding: 3px 8px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #111; flex-shrink: 0; }
         .f-top .brand { font-size: 8px; font-weight: 900; color: white; letter-spacing: 2px; }
         .f-top .year { font-size: 8px; font-weight: 900; color: white; }
         .f-photo {
-            width: 100%; flex: none; height: 150px;
+            width: 100%; flex: none; height: 165px;
             display: flex; align-items: center; justify-content: center;
             position: relative; overflow: hidden;
             background: #00B2A9; border-bottom: 1.5px solid #111;
         }
-        .avatar-display { font-size: 72px; line-height: 1; }
+        .avatar-display { font-size: 80px; line-height: 1; }
         .photo-display { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
         .rc-flag { position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 44px 44px 0; border-color: transparent #F7567C transparent transparent; }
         .rc-text { position: absolute; top: 4px; right: 4px; color: white; font-size: 7px; font-weight: 900; letter-spacing: 1px; }
-        .f-name-band { background: #111; display: flex; align-items: stretch; flex: 1; min-height: 60px; border-bottom: 1.5px solid #111; }
+        .f-name-band { background: #111; display: flex; align-items: stretch; flex: 1; min-height: 66px; border-bottom: 1.5px solid #111; }
         .f-stripe-l { background: #F7567C; width: 7px; flex-shrink: 0; }
         .f-stripe-r { background: #00B2A9; width: 7px; flex-shrink: 0; }
         .f-name-content { padding: 8px 8px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
@@ -155,70 +225,89 @@
         .b-bottom .series { font-size: 7px; color: white; letter-spacing: 1.5px; font-weight: 700; text-transform: uppercase; }
         .b-bottom .copy { font-size: 7px; color: rgba(255,255,255,0.6); }
 
-        .flip-hint { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; color: #bbb; }
+        .flip-hint {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 11px;
+            color: #aaa;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
 
-        /* ---- Change Photo ---- */
+        /* ── Change Photo ────────────────────────────────────────────── */
         .change-photo-wrap { display: flex; justify-content: center; }
+
         .change-photo-btn {
             background: white;
             color: #00B2A9;
             border: 1.5px solid #00B2A9;
-            padding: 8px 20px;
-            border-radius: 20px;
+            padding: 9px 22px;
+            border-radius: 22px;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 13px;
             cursor: pointer;
             margin: 0;
             width: auto;
             display: inline-block;
+            transition: background 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 2px 8px rgba(0,178,169,0.15);
         }
-        .change-photo-btn:hover { background: #e8f9f8; }
+        .change-photo-btn:hover {
+            background: #f0fafa;
+            box-shadow: 0 4px 14px rgba(0,178,169,0.25);
+        }
 
-        /* ---- Profile info card ---- */
+        /* ── Info card ───────────────────────────────────────────────── */
         .info-card {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-            padding: 28px 28px 24px;
+            border-radius: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+            padding: 32px 28px 28px;
             width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 24px;
         }
 
         .info-name {
-            font-family: 'Pacifico', cursive;
-            font-size: 22px;
-            color: #000;
-            margin-bottom: 4px;
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 26px;
+            color: #111;
+            margin-bottom: 5px;
+            letter-spacing: -0.3px;
+            line-height: 1.15;
         }
 
         .info-meta {
             font-size: 13px;
-            color: #888;
+            color: #bbb;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            margin-bottom: 20px;
+            font-weight: 600;
+            margin-bottom: 28px;
         }
 
         .section-title {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            color: #aaa;
+            color: #bbb;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.1em;
             margin-bottom: 10px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .tags {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-bottom: 18px;
+            margin-bottom: 22px;
         }
 
         .tag {
-            padding: 6px 14px;
+            padding: 7px 15px;
             border-radius: 20px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
@@ -228,34 +317,176 @@
 
         .info-bio {
             font-size: 14px;
-            color: #555;
-            line-height: 1.6;
-            margin-bottom: 22px;
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 24px;
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
-        .info-divider { border: none; border-top: 1px solid #eee; margin: 4px 0 18px; }
+        .info-divider { border: none; border-top: 1.5px solid #f0f0f0; margin: 4px 0 24px; }
 
         .edit-btn {
             width: 100%;
             background: #F7567C;
             color: white;
             border: none;
-            padding: 13px;
+            padding: 15px;
             border-radius: 30px;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 15px;
             cursor: pointer;
             display: block;
             margin: 0;
+            letter-spacing: 0.2px;
+            box-shadow: 0 6px 22px rgba(247,86,124,0.35);
+            transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
         }
-        .edit-btn:hover { background: #e04570; }
+        .edit-btn:hover {
+            background: #e04570;
+            box-shadow: 0 10px 30px rgba(247,86,124,0.44);
+            transform: translateY(-2px);
+        }
 
+        /* ── Requests section ────────────────────────────────────────── */
+        .requests-section {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .requests-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .requests-section-title {
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 20px;
+            color: #111;
+            letter-spacing: -0.3px;
+        }
+
+        .requests-section-link {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: #F7567C;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+        }
+        .requests-section-link:hover { text-decoration: underline; }
+
+        .profile-requests-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .request-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+            padding: 20px 22px 18px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .request-info { flex: 1; min-width: 0; }
+
+        .request-name {
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 17px;
+            color: #111;
+            margin-bottom: 6px;
+            letter-spacing: -0.2px;
+            line-height: 1.15;
+        }
+
+        .request-sport {
+            display: inline-block;
+            background: #fff0f4;
+            color: #F7567C;
+            border: 1.5px solid #F7567C;
+            border-radius: 20px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 10px;
+            margin-bottom: 6px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .request-date {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 12px;
+            color: #bbb;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            flex-shrink: 0;
+            align-self: flex-start;
+            padding: 5px 13px;
+            border-radius: 20px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .badge-pending  { background: #fff8e1; color: #b45309; border: 1.5px solid #f59e0b; }
+        .badge-accepted { background: #e6faf9; color: #00836e; border: 1.5px solid #00B2A9; }
+        .badge-declined { background: #fff0f4; color: #c4315a; border: 1.5px solid #F7567C; }
+
+        .requests-empty {
+            background: white;
+            border-radius: 20px;
+            padding: 32px 24px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+
+        .requests-empty p {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            color: #bbb;
+            margin: 0 0 16px;
+            font-weight: 600;
+        }
+
+        .requests-empty a {
+            display: inline-block;
+            background: #F7567C;
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 10px 24px;
+            border-radius: 22px;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(247,86,124,0.30);
+            transition: background 0.15s ease, transform 0.15s ease;
+        }
+        .requests-empty a:hover { background: #e04570; transform: translateY(-1px); }
+
+        /* ── Responsive ──────────────────────────────────────────────── */
         @media (max-width: 768px) {
-            .profile-wrap { padding: 28px 16px 40px; gap: 20px; }
-            .info-card { padding: 22px 18px 20px; }
-            .no-profile-card { padding: 36px 24px; }
+            .profile-wrap { padding: 0 16px 44px; }
+            .profile-hero { margin: 0 -16px 32px; width: calc(100% + 32px); padding: 28px 20px 24px; }
+            .profile-hero-name { font-size: 24px; }
+            .card-showcase { padding: 28px 20px 24px; border-radius: 24px; }
+            .info-card { padding: 24px 20px 22px; }
+            .no-profile-card { padding: 40px 24px; }
+            .request-card { flex-direction: column; gap: 10px; }
+            .status-badge { align-self: flex-start; }
         }
     </style>
 </head>
@@ -278,7 +509,7 @@
     <!-- No-profile state -->
     <div class="no-profile" id="no-profile">
         <div class="no-profile-card">
-            <div class="no-profile-icon">🏅</div>
+            <span class="no-profile-icon">🏅</span>
             <h2>No card yet</h2>
             <p>Build your Player Card and start connecting with athletes in your city.</p>
             <button onclick="window.location.href='signup.html'">Create My Card ↗</button>
@@ -287,82 +518,93 @@
 
     <!-- Profile state (revealed by JS when data exists) -->
     <div class="profile-wrap" id="profile-wrap">
-        <div class="welcome" id="welcome-msg">Welcome back!</div>
 
-        <div class="scene" onclick="this.classList.toggle('flipped')">
-            <div class="card-inner">
-                <div class="card-face card-front">
-                    <div class="card-inner-frame">
-                        <div class="f-top">
-                            <div class="brand">PLAYDATE</div>
-                            <div class="year">2026</div>
-                        </div>
-                        <div class="f-photo">
-                            <div class="avatar-display" id="card-avatar">🏃</div>
-                            <img class="photo-display" id="card-photo" src="" alt="" style="display:none">
-                            <div class="rc-flag"></div>
-                            <div class="rc-text">RC</div>
-                        </div>
-                        <div class="f-name-band">
-                            <div class="f-stripe-l"></div>
-                            <div class="f-name-content">
-                                <div class="f-name" id="card-name">YOUR NAME</div>
-                                <div class="f-sport" id="card-sport"></div>
-                                <div class="f-city" id="card-city">📍 YOUR CITY</div>
+        <div class="profile-hero">
+            <div class="hero-pip-row">
+                <div class="hero-pip" style="background:#F7567C;"></div>
+                <div class="hero-pip" style="background:#FE5733;"></div>
+                <div class="hero-pip" style="background:#00B2A9;"></div>
+            </div>
+            <div class="profile-hero-name" id="welcome-msg">Welcome back!</div>
+            <p class="profile-hero-sub">Your player profile</p>
+        </div>
+
+        <div class="card-showcase">
+            <div class="scene" onclick="this.classList.toggle('flipped')">
+                <div class="card-inner">
+                    <div class="card-face card-front">
+                        <div class="card-inner-frame">
+                            <div class="f-top">
+                                <div class="brand">PLAYDATE</div>
+                                <div class="year">2026</div>
                             </div>
-                            <div class="f-stripe-r"></div>
-                        </div>
-                        <div class="f-bottom">
-                            <div class="set">Series 1</div>
-                            <div class="num">#001</div>
+                            <div class="f-photo">
+                                <div class="avatar-display" id="card-avatar">🏃</div>
+                                <img class="photo-display" id="card-photo" src="" alt="" style="display:none">
+                                <div class="rc-flag"></div>
+                                <div class="rc-text">RC</div>
+                            </div>
+                            <div class="f-name-band">
+                                <div class="f-stripe-l"></div>
+                                <div class="f-name-content">
+                                    <div class="f-name" id="card-name">YOUR NAME</div>
+                                    <div class="f-sport" id="card-sport"></div>
+                                    <div class="f-city" id="card-city">📍 YOUR CITY</div>
+                                </div>
+                                <div class="f-stripe-r"></div>
+                            </div>
+                            <div class="f-bottom">
+                                <div class="set">Series 1</div>
+                                <div class="num">#001</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="card-face card-back-face">
-                    <div class="card-inner-frame">
-                        <div class="b-top">
-                            <div class="brand">PLAYDATE</div>
-                            <div class="num">#001</div>
-                        </div>
-                        <div class="b-accent"></div>
-                        <div class="b-body">
-                            <div class="b-name" id="card-name-back">YOUR NAME</div>
-                            <div class="b-city" id="card-city-back">📍 YOUR CITY</div>
-                            <div class="b-gender" id="card-gender"></div>
-                            <div class="b-skill" id="card-skill"></div>
-                            <div class="b-stats">
-                                <div class="b-stat" id="card-age-stat-cell">
-                                    <div class="b-stat-num" id="card-age-stat">—</div>
-                                    <div class="b-stat-lbl">Age</div>
-                                </div>
-                                <div class="b-stat" id="card-sports-stat-cell">
-                                    <div class="b-stat-num" id="sports-count">0</div>
-                                    <div class="b-stat-lbl">Sports</div>
-                                </div>
-                                <div class="b-stat">
-                                    <div class="b-stat-num">0</div>
-                                    <div class="b-stat-lbl">Played</div>
-                                </div>
+                    <div class="card-face card-back-face">
+                        <div class="card-inner-frame">
+                            <div class="b-top">
+                                <div class="brand">PLAYDATE</div>
+                                <div class="num">#001</div>
                             </div>
-                            <div class="b-section-lbl" id="card-sports-lbl">Sports</div>
-                            <div class="b-sports" id="card-sports"></div>
-                            <hr class="b-divider" id="card-divider">
-                            <div class="b-vibe" id="card-vibe-row">Vibe: <span id="card-vibe">—</span></div>
-                            <div class="b-bio" id="card-bio"></div>
-                        </div>
-                        <div class="b-bottom">
-                            <div class="series">Rookie · Series 1</div>
-                            <div class="copy">© Playdate 2026</div>
+                            <div class="b-accent"></div>
+                            <div class="b-body">
+                                <div class="b-name" id="card-name-back">YOUR NAME</div>
+                                <div class="b-city" id="card-city-back">📍 YOUR CITY</div>
+                                <div class="b-gender" id="card-gender"></div>
+                                <div class="b-skill" id="card-skill"></div>
+                                <div class="b-stats">
+                                    <div class="b-stat" id="card-age-stat-cell">
+                                        <div class="b-stat-num" id="card-age-stat">—</div>
+                                        <div class="b-stat-lbl">Age</div>
+                                    </div>
+                                    <div class="b-stat" id="card-sports-stat-cell">
+                                        <div class="b-stat-num" id="sports-count">0</div>
+                                        <div class="b-stat-lbl">Sports</div>
+                                    </div>
+                                    <div class="b-stat">
+                                        <div class="b-stat-num">0</div>
+                                        <div class="b-stat-lbl">Played</div>
+                                    </div>
+                                </div>
+                                <div class="b-section-lbl" id="card-sports-lbl">Sports</div>
+                                <div class="b-sports" id="card-sports"></div>
+                                <hr class="b-divider" id="card-divider">
+                                <div class="b-vibe" id="card-vibe-row">Vibe: <span id="card-vibe">—</span></div>
+                                <div class="b-bio" id="card-bio"></div>
+                            </div>
+                            <div class="b-bottom">
+                                <div class="series">Rookie · Series 1</div>
+                                <div class="copy">© Playdate 2026</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="flip-hint">Tap card to flip</div>
+            <div class="flip-hint">Tap card to flip ↩</div>
 
-        <div class="change-photo-wrap">
-            <button class="change-photo-btn" onclick="document.getElementById('change-photo-input').click()">📷 Change Photo</button>
-            <input type="file" id="change-photo-input" accept="image/*" style="display:none" onchange="handlePhotoChange(event)">
+            <div class="change-photo-wrap">
+                <button class="change-photo-btn" onclick="document.getElementById('change-photo-input').click()">📷 Change Photo</button>
+                <input type="file" id="change-photo-input" accept="image/*" style="display:none" onchange="handlePhotoChange(event)">
+            </div>
         </div>
 
         <div class="info-card">
@@ -392,6 +634,15 @@
             <hr class="info-divider">
             <button class="edit-btn" onclick="window.location.href='signup.html'">Edit Profile ↗</button>
         </div>
+
+        <div class="requests-section" id="requests-section" style="display:none;">
+            <div class="requests-section-header">
+                <div class="requests-section-title">My Requests</div>
+                <a class="requests-section-link" href="notifications.html">View all ↗</a>
+            </div>
+            <div class="profile-requests-list" id="profile-requests-list"></div>
+        </div>
+
     </div>
 
     <script>
@@ -523,6 +774,55 @@
                 document.getElementById('info-bio').textContent = u.bio;
             } else {
                 document.getElementById('bio-section').style.display = 'none';
+            }
+
+            // My Requests section
+            var reqRaw = localStorage.getItem('playdateRequests');
+            var requests = [];
+            try {
+                var reqParsed = JSON.parse(reqRaw || '[]');
+                requests = Array.isArray(reqParsed)
+                    ? reqParsed.filter(function(r) {
+                        return r && typeof r.name === 'string' && r.name.trim()
+                            && typeof r.sport === 'string' && r.sport.trim();
+                      })
+                    : [];
+            } catch (e) {}
+
+            var reqSection = document.getElementById('requests-section');
+            var reqList = document.getElementById('profile-requests-list');
+            reqSection.style.display = 'block';
+
+            if (requests.length === 0) {
+                reqList.innerHTML = '<div class="requests-empty"><p>No requests yet — get out there!</p><a href="athletes.html">Find Athletes ↗</a></div>';
+            } else {
+                requests.forEach(function(req) {
+                    var safeName = req.name.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    var safeSport = req.sport.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+                    var safeDate = typeof req.date === 'string'
+                        ? req.date.replace(/<[^>]*>/g, '') : '';
+                    if (!safeDate) safeDate = 'Unknown date';
+
+                    var safeStatus = typeof req.status === 'string'
+                        ? req.status.replace(/<[^>]*>/g, '') : '';
+                    if (safeStatus !== 'accepted' && safeStatus !== 'declined') safeStatus = 'pending';
+
+                    var badgeClass = safeStatus === 'accepted' ? 'badge-accepted'
+                                   : safeStatus === 'declined' ? 'badge-declined'
+                                   : 'badge-pending';
+
+                    var card = document.createElement('div');
+                    card.className = 'request-card';
+                    card.innerHTML =
+                        '<div class="request-info">' +
+                            '<div class="request-name">' + safeName + '</div>' +
+                            '<div><span class="request-sport">' + safeSport + '</span></div>' +
+                            '<div class="request-date">Requested ' + safeDate + '</div>' +
+                        '</div>' +
+                        '<div class="status-badge ' + badgeClass + '">' + safeStatus + '</div>';
+                    reqList.appendChild(card);
+                });
             }
         }
     </script>

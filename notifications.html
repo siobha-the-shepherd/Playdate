@@ -5,36 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Playdate — Notifications</title>
   <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fraunces:wght@600&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     body {
       padding-top: 55px;
       min-height: 100vh;
+      background: #f7f8fa;
     }
 
-    .page-header {
+    /* ── Page hero ───────────────────────────────────────────────────── */
+    .page-hero {
+      background: white;
+      border-bottom: 1.5px solid #f0f0f0;
+      padding: 40px 24px 32px;
       text-align: center;
-      padding: 44px 20px 28px;
     }
 
-    .page-header h1 {
-      font-family: 'Pacifico', cursive;
+    .hero-pip-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .hero-pip {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .hero-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 700;
       font-size: 36px;
-      color: #000;
-      margin-bottom: 8px;
+      color: #111;
+      letter-spacing: -0.5px;
+      margin: 0 0 8px;
+      line-height: 1.1;
     }
 
-    .page-header p {
+    .hero-subtitle {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 15px;
-      color: #888;
+      font-size: 11px;
+      font-weight: 700;
+      color: #bbb;
       margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
     }
 
+    /* ── Requests list ───────────────────────────────────────────────── */
     .requests-list {
       max-width: 560px;
       margin: 0 auto;
-      padding: 0 20px 60px;
+      padding: 32px 20px 64px;
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -42,23 +67,30 @@
 
     .request-card {
       background: white;
-      border-radius: 20px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-      padding: 22px 24px 20px;
+      border-radius: 22px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+      padding: 24px 24px 20px;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 16px;
+      transition: box-shadow 0.2s ease, transform 0.15s ease;
+    }
+    .request-card:hover {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+      transform: translateY(-1px);
     }
 
     .request-info { flex: 1; min-width: 0; }
 
     .request-name {
       font-family: 'Fraunces', serif;
-      font-weight: 600;
-      font-size: 18px;
+      font-weight: 700;
+      font-size: 19px;
       color: #111;
-      margin-bottom: 4px;
+      margin-bottom: 7px;
+      letter-spacing: -0.2px;
+      line-height: 1.15;
     }
 
     .request-sport {
@@ -68,17 +100,20 @@
       border: 1.5px solid #F7567C;
       border-radius: 20px;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 2px 10px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 11px;
       margin-bottom: 8px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
 
     .request-date {
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 12px;
-      color: #aaa;
-      margin-bottom: 14px;
+      color: #bbb;
+      margin-bottom: 16px;
+      font-weight: 600;
     }
 
     .request-actions {
@@ -90,37 +125,44 @@
       background: #00B2A9;
       color: white;
       border: none;
-      border-radius: 20px;
-      padding: 7px 16px;
+      border-radius: 22px;
+      padding: 9px 18px;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 13px;
       cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,178,169,0.30);
+      transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
     }
-    .btn-accept:hover { background: #009e96; }
+    .btn-accept:hover {
+      background: #009e96;
+      box-shadow: 0 6px 18px rgba(0,178,169,0.40);
+      transform: translateY(-1px);
+    }
 
     .btn-decline {
       background: white;
       color: #F7567C;
       border: 1.5px solid #F7567C;
-      border-radius: 20px;
-      padding: 7px 16px;
+      border-radius: 22px;
+      padding: 9px 18px;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 13px;
       cursor: pointer;
+      transition: background 0.15s ease;
     }
     .btn-decline:hover { background: #fff0f4; }
 
     .status-badge {
       flex-shrink: 0;
       align-self: flex-start;
-      padding: 5px 13px;
+      padding: 5px 14px;
       border-radius: 20px;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 12px;
+      font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
     }
 
@@ -128,7 +170,7 @@
     .badge-accepted { background: #e6faf9; color: #00836e; border: 1.5px solid #00B2A9; }
     .badge-declined { background: #fff0f4; color: #c4315a; border: 1.5px solid #F7567C; }
 
-    /* Empty state */
+    /* ── Empty state ─────────────────────────────────────────────────── */
     .empty-state {
       display: none;
       flex-direction: column;
@@ -139,22 +181,24 @@
     }
     .empty-state.visible { display: flex; }
 
-    .empty-emoji { font-size: 56px; margin-bottom: 18px; }
+    .empty-emoji { font-size: 64px; margin-bottom: 22px; display: block; }
 
     .empty-state h2 {
       font-family: 'Fraunces', serif;
-      font-weight: 600;
-      font-size: 22px;
+      font-weight: 700;
+      font-size: 26px;
       color: #111;
-      margin: 0 0 10px;
+      margin: 0 0 12px;
+      letter-spacing: -0.3px;
     }
 
     .empty-state p {
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 15px;
-      color: #888;
-      margin: 0 0 28px;
-      line-height: 1.6;
+      color: #999;
+      margin: 0 0 32px;
+      line-height: 1.65;
+      max-width: 300px;
     }
 
     .empty-state a {
@@ -162,16 +206,23 @@
       background: #F7567C;
       color: white;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 600;
-      font-size: 15px;
-      padding: 12px 28px;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 14px 32px;
       border-radius: 30px;
       text-decoration: none;
+      box-shadow: 0 6px 20px rgba(247,86,124,0.38);
+      transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
     }
-    .empty-state a:hover { background: #e04570; }
+    .empty-state a:hover {
+      background: #e04570;
+      box-shadow: 0 10px 28px rgba(247,86,124,0.45);
+      transform: translateY(-2px);
+    }
 
     @media (max-width: 768px) {
-      .page-header h1 { font-size: 28px; }
+      .hero-title { font-size: 28px; }
+      .page-hero { padding: 28px 20px 22px; }
       .request-card { flex-direction: column; gap: 12px; }
       .status-badge { align-self: flex-start; }
     }
@@ -194,9 +245,14 @@
   </nav>
   <script>if(localStorage.getItem('playdateUser')){document.getElementById('nav-signup').style.display='none';}</script>
 
-  <div class="page-header">
-    <h1>Notifications</h1>
-    <p>Your playdate requests</p>
+  <div class="page-hero">
+    <div class="hero-pip-row">
+      <div class="hero-pip" style="background:#F7567C;"></div>
+      <div class="hero-pip" style="background:#FE5733;"></div>
+      <div class="hero-pip" style="background:#00B2A9;"></div>
+    </div>
+    <h1 class="hero-title">Notifications</h1>
+    <p class="hero-subtitle">Your playdate requests</p>
   </div>
 
   <div class="empty-state" id="empty-state">
