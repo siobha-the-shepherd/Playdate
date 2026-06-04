@@ -501,6 +501,22 @@
             letter-spacing: 0.02em;
         }
 
+        /* ── Photo save error ───────────────────────────────────────── */
+        .photo-save-msg {
+            display: none;
+            background: #fff8e1;
+            color: #92400e;
+            border: 1.5px solid #f59e0b;
+            border-radius: 14px;
+            padding: 13px 16px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-top: 14px;
+            text-align: center;
+        }
+
         /* ── Responsive ─────────────────────────────────────────────── */
         @media (max-width: 768px) {
             .hero-title { font-size: 28px; }
@@ -650,6 +666,7 @@
             </div>
 
             <button class="submit-btn" onclick="saveAndRedirect()">Create My Card ↗</button>
+            <div id="photo-save-msg" class="photo-save-msg">Photo couldn't be saved — your card was created with an emoji avatar instead. Try a smaller image or clear some browser storage.</div>
             <p class="login-link">Already have an account? <a href="#">Log in</a></p>
         </div>
 
@@ -723,6 +740,35 @@
     </div>
 
     <script>
+        function compressPhoto(file, callback) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    try {
+                        var maxW = 800;
+                        var w = img.width, h = img.height;
+                        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+                        var canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        callback(canvas.toDataURL('image/jpeg', 0.70));
+                    } catch (err) {
+                        callback(e.target.result);
+                    }
+                };
+                img.onerror = function() { callback(e.target.result); };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showPhotoError() {
+            var msg = document.getElementById('photo-save-msg');
+            if (msg) msg.style.display = 'block';
+        }
+
         let selectedAvatar = '🏃';
         let usingPhoto = false;
         let selectedGender = '';
@@ -778,11 +824,9 @@
         }
 
         function handlePhotoUpload(event) {
-            const file = event.target.files[0];
+            var file = event.target.files[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const src = e.target.result;
+            compressPhoto(file, function(src) {
                 document.getElementById('upload-placeholder').style.display = 'none';
                 document.getElementById('upload-preview').src = src;
                 document.getElementById('upload-preview').style.display = 'block';
@@ -790,8 +834,7 @@
                 document.getElementById('card-photo').style.display = 'block';
                 document.getElementById('card-avatar').style.display = 'none';
                 usingPhoto = true;
-            };
-            reader.readAsDataURL(file);
+            });
         }
 
         function toggleSport(el) {
@@ -859,9 +902,18 @@
             try {
                 localStorage.setItem('playdateUser', JSON.stringify(userData));
             } catch (e) {
+                showPhotoError();
+                usingPhoto = false;
                 userData.photo = null;
                 userData.usingPhoto = false;
-                localStorage.setItem('playdateUser', JSON.stringify(userData));
+                document.getElementById('card-photo').style.display = 'none';
+                document.getElementById('card-avatar').style.display = 'block';
+                try {
+                    localStorage.setItem('playdateUser', JSON.stringify(userData));
+                } catch (e2) {
+                    alert('Unable to save your profile. Your browser storage may be full.');
+                    return;
+                }
             }
             window.location.href = 'profile.html';
         }

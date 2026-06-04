@@ -477,6 +477,23 @@
         }
         .requests-empty a:hover { background: #e04570; transform: translateY(-1px); }
 
+        /* ── Photo save error ────────────────────────────────────────── */
+        .photo-save-msg {
+            display: none;
+            background: #fff8e1;
+            color: #92400e;
+            border: 1.5px solid #f59e0b;
+            border-radius: 14px;
+            padding: 13px 16px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.5;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
         /* ── Responsive ──────────────────────────────────────────────── */
         @media (max-width: 768px) {
             .profile-wrap { padding: 0 16px 44px; }
@@ -605,6 +622,7 @@
                 <button class="change-photo-btn" onclick="document.getElementById('change-photo-input').click()">📷 Change Photo</button>
                 <input type="file" id="change-photo-input" accept="image/*" style="display:none" onchange="handlePhotoChange(event)">
             </div>
+            <div id="photo-save-msg" class="photo-save-msg">Photo couldn't be saved — try a smaller image or clear some browser storage.</div>
         </div>
 
         <div class="info-card">
@@ -646,12 +664,42 @@
     </div>
 
     <script>
+        function compressPhoto(file, callback) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    try {
+                        var maxW = 800;
+                        var w = img.width, h = img.height;
+                        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+                        var canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        callback(canvas.toDataURL('image/jpeg', 0.70));
+                    } catch (err) {
+                        callback(e.target.result);
+                    }
+                };
+                img.onerror = function() { callback(e.target.result); };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showPhotoError() {
+            var msg = document.getElementById('photo-save-msg');
+            if (msg) {
+                msg.style.display = 'block';
+                setTimeout(function() { msg.style.display = 'none'; }, 6000);
+            }
+        }
+
         function handlePhotoChange(event) {
             var file = event.target.files[0];
             if (!file) return;
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                var src = e.target.result;
+            compressPhoto(file, function(src) {
                 document.getElementById('card-photo').src = src;
                 document.getElementById('card-photo').style.display = 'block';
                 document.getElementById('card-avatar').style.display = 'none';
@@ -663,12 +711,18 @@
                         userData.usingPhoto = true;
                         try {
                             localStorage.setItem('playdateUser', JSON.stringify(userData));
-                        } catch (storageErr) {}
+                        } catch (storageErr) {
+                            showPhotoError();
+                            userData.photo = null;
+                            userData.usingPhoto = false;
+                            try { localStorage.setItem('playdateUser', JSON.stringify(userData)); } catch (e) {}
+                            document.getElementById('card-photo').style.display = 'none';
+                            document.getElementById('card-avatar').style.display = 'block';
+                        }
                     } catch (parseErr) {}
                 }
                 event.target.value = '';
-            };
-            reader.readAsDataURL(file);
+            });
         }
 
         var raw = localStorage.getItem('playdateUser');
