@@ -6,6 +6,7 @@
     <title>Playdate — Sign Up</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="storage.js"></script>
     <style>
         body {
             padding-top: 55px;
@@ -470,7 +471,7 @@
             <a href="profile.html" class="profile-icon">👤</a>
         </div>
     </nav>
-    <script>if(localStorage.getItem('playdateUser')){document.getElementById('nav-signup').style.display='none';}</script>
+    <script>if(PlaydateStorage.hasUser()){document.getElementById('nav-signup').style.display='none';}</script>
 
     <div class="split-layout">
 
@@ -849,18 +850,14 @@
                 usingPhoto: usingPhoto,
                 photo: usingPhoto ? document.getElementById('card-photo').src : null
             };
-            try {
-                localStorage.setItem('playdateUser', JSON.stringify(userData));
-            } catch (e) {
+            if (!PlaydateStorage.setUser(userData)) {
                 showPhotoError();
                 usingPhoto = false;
                 userData.photo = null;
                 userData.usingPhoto = false;
                 document.getElementById('card-photo').style.display = 'none';
                 document.getElementById('card-avatar').style.display = 'block';
-                try {
-                    localStorage.setItem('playdateUser', JSON.stringify(userData));
-                } catch (e2) {
+                if (!PlaydateStorage.setUser(userData)) {
                     alert('Unable to save your profile. Your browser storage may be full.');
                     return;
                 }
@@ -870,10 +867,7 @@
 
         // Pre-fill form fields from localStorage when editing an existing profile
         (function () {
-            var raw = localStorage.getItem('playdateUser');
-            if (!raw) return;
-            var u;
-            try { u = JSON.parse(raw); } catch (e) { return; }
+            var u = PlaydateStorage.getUser();
             if (!u) return;
 
             document.getElementById('form-heading').textContent = 'Edit Profile';

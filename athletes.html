@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="storage.js"></script>
   <style>
     :root { --nav-height: 55px; }
 
@@ -564,7 +565,7 @@
         <a href="profile.html" class="profile-icon">👤</a>
     </div>
   </nav>
-  <script>if(localStorage.getItem('playdateUser')){document.getElementById('nav-signup').style.display='none';}</script>
+  <script>if(PlaydateStorage.hasUser()){document.getElementById('nav-signup').style.display='none';}</script>
 
   <div class="page-below-nav">
 
@@ -673,26 +674,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const athletes = [
-      // ~1–5 miles from Vero Beach center
-      { name: "Marcus Rivera",    sport: "Tennis",     skill: "Bring it on",    lat: 27.6510, lng: -80.3770 },
-      { name: "Priya Nair",       sport: "Running",    skill: "Just for laughs",lat: 27.5950, lng: -80.3970 },
-      { name: "Jake Thompson",    sport: "Pickleball", skill: "Friendly match", lat: 27.6400, lng: -80.4210 },
-      { name: "Sofia Delgado",    sport: "Soccer",     skill: "Friendly match", lat: 27.6650, lng: -80.4370 },
-      { name: "Carlos Webb",      sport: "Basketball", skill: "Bring it on",    lat: 27.6060, lng: -80.3680 },
-      // ~6–13 miles from Vero Beach center
-      { name: "Aisha Brooks",     sport: "Cycling",    skill: "Just for laughs",lat: 27.7410, lng: -80.4000 },
-      { name: "Derek Fontaine",   sport: "Tennis",     skill: "Friendly match", lat: 27.5830, lng: -80.4840 },
-      { name: "Lena Kowalski",    sport: "Running",    skill: "Bring it on",    lat: 27.7380, lng: -80.3300 },
-      { name: "Omar Castillo",    sport: "Pickleball", skill: "Just for laughs",lat: 27.4800, lng: -80.3920 },
-      { name: "Natalie Cruz",     sport: "Soccer",     skill: "Bring it on",    lat: 27.7270, lng: -80.4910 },
-      { name: "Ryan Okafor",      sport: "Basketball", skill: "Friendly match", lat: 27.5730, lng: -80.3430 },
-      { name: "Jade Mercado",     sport: "Cycling",    skill: "Bring it on",    lat: 27.8270, lng: -80.3850 },
-      // ~18–22 miles from Vero Beach center
-      { name: "Tyler Nguyen",     sport: "Running",    skill: "Just for laughs",lat: 27.3770, lng: -80.4280 },
-      { name: "Simone Hardy",     sport: "Basketball", skill: "Just for laughs",lat: 27.8750, lng: -80.5650 },
-      { name: "Leo Papadopoulos", sport: "Pickleball", skill: "Friendly match", lat: 27.9570, lng: -80.3730 },
-    ];
+    const athletes = [];
 
     const sportColors = {
       Tennis: "#F7567C",
@@ -713,14 +695,7 @@
     }).addTo(map);
 
     // Read signed-up user profile once at load time
-    var profileUser = null;
-    try {
-      var _raw = localStorage.getItem('playdateUser');
-      if (_raw) {
-        var _parsed = JSON.parse(_raw);
-        if (_parsed && typeof _parsed === 'object' && !Array.isArray(_parsed)) profileUser = _parsed;
-      }
-    } catch(e) {}
+    var profileUser = PlaydateStorage.getUser();
 
     let markers = [];
     let userMarker = null;
@@ -784,7 +759,7 @@
         }
       });
 
-      document.getElementById('empty-state').classList.toggle('visible', markers.length === 0);
+      document.getElementById('empty-state').classList.toggle('visible', markers.length === 0 && !userMarker);
     }
 
     function placeUserMarker() {
@@ -901,13 +876,10 @@
     /* ── Playdate modal ──────────────────────────────────────────────── */
     function requestPlaydate(name, sport) {
       const today = new Date().toISOString();
-      let requests = [];
-      try {
-        const parsed = JSON.parse(localStorage.getItem('playdateRequests') || '[]');
-        requests = Array.isArray(parsed) ? parsed : [];
-      } catch (e) {}
-      requests.push({ name, sport, date: today, status: 'pending' });
-      localStorage.setItem('playdateRequests', JSON.stringify(requests));
+      if (!PlaydateStorage.addRequest({ name: name, sport: sport, date: today, status: 'pending' })) {
+        alert("Couldn't save your request — your browser storage may be full. Please try again.");
+        return;
+      }
       document.getElementById('modal-athlete-name').textContent = name;
       document.getElementById('playdate-modal').classList.add('visible');
       map.closePopup();

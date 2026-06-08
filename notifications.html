@@ -6,6 +6,7 @@
   <title>Playdate — Notifications</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="storage.js"></script>
   <style>
     body {
       padding-top: 55px;
@@ -278,7 +279,7 @@
       <a href="profile.html" class="profile-icon">👤</a>
     </div>
   </nav>
-  <script>if(localStorage.getItem('playdateUser')){document.getElementById('nav-signup').style.display='none';}</script>
+  <script>if(PlaydateStorage.hasUser()){document.getElementById('nav-signup').style.display='none';}</script>
 
   <div class="page-hero">
     <div class="hero-pip-row">
@@ -304,24 +305,11 @@
   <div class="requests-list" id="requests-list"></div>
 
   <script>
-    function loadRequests() {
-      try {
-        const parsed = JSON.parse(localStorage.getItem('playdateRequests') || '[]');
-        return Array.isArray(parsed) ? parsed : [];
-      } catch (e) {
-        return [];
-      }
-    }
-
-    function saveRequests(requests) {
-      localStorage.setItem('playdateRequests', JSON.stringify(requests));
-    }
-
     function updateStatus(index, status) {
-      const requests = loadRequests();
+      var requests = PlaydateStorage.getRequests();
       if (requests[index]) {
         requests[index].status = status;
-        saveRequests(requests);
+        PlaydateStorage.setRequests(requests);
         render();
       }
     }
@@ -344,25 +332,15 @@
     }
 
     function clearCompleted() {
-      const remaining = loadRequests().filter(function(req) {
+      var remaining = PlaydateStorage.getRequests().filter(function (req) {
         return req.status !== 'accepted' && req.status !== 'declined';
       });
-      saveRequests(remaining);
+      PlaydateStorage.setRequests(remaining);
       render();
     }
 
     function render() {
-      const raw = loadRequests();
-
-      const requests = raw.filter(function (req) {
-        return req && typeof req === 'object'
-          && typeof req.name === 'string' && req.name.trim()
-          && typeof req.sport === 'string' && req.sport.trim();
-      });
-
-      if (requests.length !== raw.length) {
-        saveRequests(requests);
-      }
+      var requests = PlaydateStorage.getRequests();
 
       const list = document.getElementById('requests-list');
       const empty = document.getElementById('empty-state');

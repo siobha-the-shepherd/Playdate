@@ -6,6 +6,7 @@
     <title>Playdate — My Profile</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="storage.js"></script>
     <style>
         body {
             background: #f7f8fa;
@@ -665,7 +666,7 @@
             <a href="profile.html" class="profile-icon">👤</a>
         </div>
     </nav>
-    <script>if(localStorage.getItem('playdateUser')){document.getElementById('nav-signup').style.display='none';}</script>
+    <script>if(PlaydateStorage.hasUser()){document.getElementById('nav-signup').style.display='none';}</script>
 
     <!-- No-profile state -->
     <div class="no-profile" id="no-profile">
@@ -847,36 +848,24 @@
                 document.getElementById('card-photo').src = src;
                 document.getElementById('card-photo').style.display = 'block';
                 document.getElementById('card-avatar').style.display = 'none';
-                var raw = localStorage.getItem('playdateUser');
-                if (raw) {
-                    try {
-                        var userData = JSON.parse(raw);
-                        userData.photo = src;
-                        userData.usingPhoto = true;
-                        try {
-                            localStorage.setItem('playdateUser', JSON.stringify(userData));
-                        } catch (storageErr) {
-                            showPhotoError();
-                            userData.photo = null;
-                            userData.usingPhoto = false;
-                            try { localStorage.setItem('playdateUser', JSON.stringify(userData)); } catch (e) {}
-                            document.getElementById('card-photo').style.display = 'none';
-                            document.getElementById('card-avatar').style.display = 'block';
-                        }
-                    } catch (parseErr) {}
+                var userData = PlaydateStorage.getUser();
+                if (userData) {
+                    userData.photo = src;
+                    userData.usingPhoto = true;
+                    if (!PlaydateStorage.setUser(userData)) {
+                        showPhotoError();
+                        userData.photo = null;
+                        userData.usingPhoto = false;
+                        PlaydateStorage.setUser(userData);
+                        document.getElementById('card-photo').style.display = 'none';
+                        document.getElementById('card-avatar').style.display = 'block';
+                    }
                 }
                 event.target.value = '';
             });
         }
 
-        var raw = localStorage.getItem('playdateUser');
-        var u = null;
-        if (raw) {
-            try {
-                var parsed = JSON.parse(raw);
-                if (parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)) u = parsed;
-            } catch (e) {}
-        }
+        var u = PlaydateStorage.getUser();
 
         if (u) {
             document.getElementById('no-profile').style.display = 'none';
@@ -980,17 +969,7 @@
             }
 
             // My Requests section
-            var reqRaw = localStorage.getItem('playdateRequests');
-            var requests = [];
-            try {
-                var reqParsed = JSON.parse(reqRaw || '[]');
-                requests = Array.isArray(reqParsed)
-                    ? reqParsed.filter(function(r) {
-                        return r && typeof r.name === 'string' && r.name.trim()
-                            && typeof r.sport === 'string' && r.sport.trim();
-                      })
-                    : [];
-            } catch (e) {}
+            var requests = PlaydateStorage.getRequests();
 
             var reqSection = document.getElementById('requests-section');
             var reqList = document.getElementById('profile-requests-list');

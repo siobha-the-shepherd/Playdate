@@ -6,6 +6,7 @@
     <title>Playdate</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="storage.js"></script>
     <style>
         /* ── Hero overrides ─────────────────────────────────────────── */
         body {
@@ -209,7 +210,7 @@
             <a href="profile.html" class="profile-icon">👤</a>
         </div>
     </nav>
-    <script>if(localStorage.getItem('playdateUser')){document.getElementById('nav-signup').style.display='none';}</script>
+    <script>if(PlaydateStorage.hasUser()){document.getElementById('nav-signup').style.display='none';}</script>
     <h1>Playdate</h1>
     <p class="tagline">The game needs you.</p>
     <button class="hero-cta" onclick="window.location.href='athletes.html'">Find Your Game ↗</button>
