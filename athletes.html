@@ -7,7 +7,9 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="storage.js"></script>
+  <script src="supabase.js"></script>
   <style>
     :root { --nav-height: 55px; }
 
@@ -565,7 +567,7 @@
         <a href="profile.html" class="profile-icon">👤</a>
     </div>
   </nav>
-  <script>if(PlaydateStorage.hasUser()){document.getElementById('nav-signup').style.display='none';}</script>
+  <script>initNavAuth();</script>
 
   <div class="page-below-nav">
 
@@ -694,7 +696,7 @@
       attribution: '© OpenStreetMap contributors © CARTO'
     }).addTo(map);
 
-    // Read signed-up user profile once at load time
+    // profileUser is populated by getProfileWithFallback() before geolocation starts
     var profileUser = PlaydateStorage.getUser();
 
     let markers = [];
@@ -807,27 +809,38 @@
       }
     }
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        function(pos) {
-          userLat = pos.coords.latitude;
-          userLng = pos.coords.longitude;
-          map.setView([userLat, userLng], 13);
-          document.getElementById('location-banner').style.display = 'block';
-          placeUserMarker();
-          renderMarkers();
-        },
-        function() {
-          // Geolocation denied — only show blue dot for anonymous (no-profile) users
-          if (!profileUser) placeUserMarker();
-          renderMarkers();
-        }
-      );
-    } else {
-      // No geolocation API — same as denied
-      if (!profileUser) placeUserMarker();
-      renderMarkers();
+    function _startGeolocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(pos) {
+            userLat = pos.coords.latitude;
+            userLng = pos.coords.longitude;
+            map.setView([userLat, userLng], 13);
+            document.getElementById('location-banner').style.display = 'block';
+            placeUserMarker();
+            renderMarkers();
+          },
+          function() {
+            // Geolocation denied — only show blue dot for anonymous (no-profile) users
+            if (!profileUser) placeUserMarker();
+            renderMarkers();
+          }
+        );
+      } else {
+        // No geolocation API — same as denied
+        if (!profileUser) placeUserMarker();
+        renderMarkers();
+      }
     }
+
+    // Wait for Supabase profile before starting geolocation so the sport-colored
+    // marker is placed instead of the anonymous blue dot when localStorage is empty.
+    getProfileWithFallback().then(function(p) {
+      if (p) profileUser = p;
+      _startGeolocation();
+    }).catch(function() {
+      _startGeolocation();
+    });
 
     /* ── Drawer ──────────────────────────────────────────────────────── */
     function openDrawer() {

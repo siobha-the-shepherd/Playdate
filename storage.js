@@ -121,11 +121,16 @@ var PlaydateStorage = (function () {
         return setRequests(requests);
     }
 
+    function clearUser() {
+        localStorage.removeItem(USER_KEY);
+    }
+
     // ── Public API ─────────────────────────────────────────────────────────
     return {
         hasUser:     hasUser,
         getUser:     getUser,
         setUser:     setUser,
+        clearUser:   clearUser,
         getRequests: getRequests,
         setRequests: setRequests,
         addRequest:  addRequest

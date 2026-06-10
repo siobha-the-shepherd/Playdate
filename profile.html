@@ -6,7 +6,9 @@
     <title>Playdate — My Profile</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="storage.js"></script>
+    <script src="supabase.js"></script>
     <style>
         body {
             background: #f7f8fa;
@@ -666,7 +668,7 @@
             <a href="profile.html" class="profile-icon">👤</a>
         </div>
     </nav>
-    <script>if(PlaydateStorage.hasUser()){document.getElementById('nav-signup').style.display='none';}</script>
+    <script>initNavAuth();</script>
 
     <!-- No-profile state -->
     <div class="no-profile" id="no-profile">
@@ -796,6 +798,7 @@
 
             <hr class="info-divider">
             <button class="edit-btn" onclick="window.location.href='signup.html'">Edit Profile ↗</button>
+            <button class="edit-btn" id="logout-btn" onclick="logOut()" style="background:none;color:#aaa;border:1.5px solid #e0e0e0;box-shadow:none;margin-top:10px;">Log Out</button>
         </div>
 
         <div class="requests-section" id="requests-section" style="display:none;">
@@ -865,7 +868,14 @@
             });
         }
 
-        var u = PlaydateStorage.getUser();
+        async function logOut() {
+            var btn = document.getElementById('logout-btn');
+            if (btn) { btn.disabled = true; btn.textContent = 'Logging out…'; }
+            await signOut();
+            window.location.href = 'index.html';
+        }
+
+        getProfileWithFallback().then(function(u) {
 
         if (u) {
             document.getElementById('no-profile').style.display = 'none';
@@ -1007,6 +1017,8 @@
                 });
             }
         }
+
+        }); // end getProfileWithFallback().then
     </script>
 </body>
 </html>

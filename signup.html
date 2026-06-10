@@ -6,7 +6,9 @@
     <title>Playdate — Sign Up</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="storage.js"></script>
+    <script src="supabase.js"></script>
     <style>
         body {
             padding-top: 55px;
@@ -471,7 +473,7 @@
             <a href="profile.html" class="profile-icon">👤</a>
         </div>
     </nav>
-    <script>if(PlaydateStorage.hasUser()){document.getElementById('nav-signup').style.display='none';}</script>
+    <script>initNavAuth();</script>
 
     <div class="split-layout">
 
@@ -490,13 +492,16 @@
                 <label>Full name</label>
                 <input type="text" id="input-name" placeholder="Jane Smith" oninput="updateCard()">
             </div>
-            <div class="field">
+            <div id="auth-fields">
+              <div class="field">
                 <label>Email</label>
-                <input type="email" placeholder="jane@email.com">
-            </div>
-            <div class="field">
+                <input type="email" id="input-email" placeholder="jane@email.com">
+              </div>
+              <div class="field">
                 <label>Password</label>
-                <input type="password" placeholder="••••••••">
+                <input type="password" id="input-password" placeholder="••••••••" autocomplete="new-password">
+              </div>
+              <div id="auth-error" style="display:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#c0392b;background:#fff0f0;border:1.5px solid #f5c6cb;border-radius:10px;padding:10px 14px;margin-bottom:4px;"></div>
             </div>
             <div class="field">
                 <label>City</label>
@@ -593,9 +598,9 @@
                 <input class="add-sport-input" id="add-sport-input" type="text" placeholder="e.g. Rowing" onkeydown="addCustomSport(event)">
             </div>
 
-            <button class="submit-btn" onclick="saveAndRedirect()">Create My Card ↗</button>
+            <button class="submit-btn" id="submit-btn" onclick="saveAndRedirect()">Create My Card ↗</button>
             <div id="photo-save-msg" class="photo-save-msg">Photo couldn't be saved — your card was created with an emoji avatar instead. Try a smaller image or clear some browser storage.</div>
-            <p class="login-link">Already have an account? <a href="#">Log in</a></p>
+            <p class="login-link" id="login-link-p">Already have an account? <a href="#" onclick="openLoginModal(event)">Log in</a></p>
 
         </div>
 
@@ -830,14 +835,9 @@
             }
         }
 
-        function saveAndRedirect() {
+        function _collectUserData() {
             const name = document.getElementById('input-name').value.trim();
-            if (!name) {
-                alert('Please enter your name to create your card.');
-                document.getElementById('input-name').focus();
-                return;
-            }
-            const userData = {
+            return {
                 name: name,
                 city: document.getElementById('input-city').value.trim(),
                 age: document.getElementById('input-age').value.trim(),
@@ -850,6 +850,9 @@
                 usingPhoto: usingPhoto,
                 photo: usingPhoto ? document.getElementById('card-photo').src : null
             };
+        }
+
+        function _saveLocally(userData) {
             if (!PlaydateStorage.setUser(userData)) {
                 showPhotoError();
                 usingPhoto = false;
@@ -858,10 +861,105 @@
                 document.getElementById('card-photo').style.display = 'none';
                 document.getElementById('card-avatar').style.display = 'block';
                 if (!PlaydateStorage.setUser(userData)) {
-                    alert('Unable to save your profile. Your browser storage may be full.');
-                    return;
+                    return false;
                 }
             }
+            return true;
+        }
+
+        function _setSubmitLoading(loading) {
+            var btn = document.getElementById('submit-btn');
+            btn.disabled = loading;
+            btn.textContent = loading ? 'Saving…' : (PlaydateStorage.hasUser() ? 'Save Changes ↗' : 'Create My Card ↗');
+        }
+
+        function _showAuthError(msg) {
+            var el = document.getElementById('auth-error');
+            if (!el) return;
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function _clearAuthError() {
+            var el = document.getElementById('auth-error');
+            if (el) el.style.display = 'none';
+        }
+
+        async function saveAndRedirect() {
+            const name = document.getElementById('input-name').value.trim();
+            if (!name) {
+                alert('Please enter your name to create your card.');
+                document.getElementById('input-name').focus();
+                return;
+            }
+
+            const userData = _collectUserData();
+            const isEditing = PlaydateStorage.hasUser();
+
+            _clearAuthError();
+            _setSubmitLoading(true);
+
+            try {
+                if (isEditing) {
+                    // Edit mode: update localStorage then sync to Supabase before redirect
+                    if (!_saveLocally(userData)) {
+                        alert('Unable to save your profile. Your browser storage may be full.');
+                        return;
+                    }
+                    var editOk = await upsertProfile(userData);
+                    if (!editOk) {
+                        console.warn('[Playdate] Edit: upsertProfile failed — profile saved to localStorage only.');
+                    }
+                } else {
+                    // New signup: create Supabase auth account first
+                    const email = document.getElementById('input-email').value.trim();
+                    const password = document.getElementById('input-password').value;
+
+                    if (!email) {
+                        _showAuthError('Please enter your email address.');
+                        document.getElementById('input-email').focus();
+                        return;
+                    }
+                    if (!password) {
+                        _showAuthError('Please enter a password.');
+                        document.getElementById('input-password').focus();
+                        return;
+                    }
+
+                    var signUpResult = await sb.auth.signUp({ email: email, password: password });
+                    if (signUpResult.error) {
+                        _showAuthError(authErrorMessage(signUpResult.error));
+                        return;
+                    }
+
+                    // Save to localStorage so the app works regardless of Supabase state
+                    if (!_saveLocally(userData)) {
+                        alert('Unable to save your profile. Your browser storage may be full.');
+                        return;
+                    }
+
+                    // If a session is active immediately (email confirmation disabled),
+                    // write the profile row now. If session is null (confirmation pending),
+                    // localStorage data is valid — the row will sync after the user confirms.
+                    if (signUpResult.data && signUpResult.data.session) {
+                        var signUpOk = await upsertProfile(userData);
+                        if (!signUpOk) {
+                            console.warn('[Playdate] Signup: upsertProfile failed — profile saved to localStorage only.');
+                        }
+                    }
+                }
+            } catch (e) {
+                // Network failure: fall back to localStorage-only
+                if (!isEditing) {
+                    if (!_saveLocally(userData)) {
+                        alert('Unable to save your profile. Please try again.');
+                        return;
+                    }
+                }
+            } finally {
+                _setSubmitLoading(false);
+            }
+
             window.location.href = 'profile.html';
         }
 
@@ -872,6 +970,11 @@
 
             document.getElementById('form-heading').textContent = 'Edit Profile';
             document.title = 'Playdate — Edit Profile';
+            document.getElementById('submit-btn').textContent = 'Save Changes ↗';
+            var authDiv = document.getElementById('auth-fields');
+            if (authDiv) authDiv.style.display = 'none';
+            var loginLinkP = document.getElementById('login-link-p');
+            if (loginLinkP) loginLinkP.style.display = 'none';
 
             if (u.name) document.getElementById('input-name').value = u.name;
             if (u.city) document.getElementById('input-city').value = u.city;
@@ -923,6 +1026,112 @@
             updateCard();
             updateSportsOnCard();
         })();
+
+        // ── Login modal ────────────────────────────────────────────────────
+        function openLoginModal(e) {
+            if (e) e.preventDefault();
+            document.getElementById('login-modal').style.display = 'flex';
+            document.getElementById('login-email').focus();
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').style.display = 'none';
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-password').value = '';
+        }
+
+        async function loginUser() {
+            var email    = document.getElementById('login-email').value.trim();
+            var password = document.getElementById('login-password').value;
+            var errEl    = document.getElementById('login-error');
+            var btn      = document.getElementById('login-btn');
+
+            errEl.style.display = 'none';
+
+            if (!email || !password) {
+                errEl.textContent = 'Please enter your email and password.';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Logging in…';
+
+            try {
+                var result = await sb.auth.signInWithPassword({ email: email, password: password });
+                if (result.error) {
+                    errEl.textContent = authErrorMessage(result.error);
+                    errEl.style.display = 'block';
+                    return;
+                }
+
+                // Load profile from Supabase and merge with local photo
+                var profileResult = await sb.from('profiles').select('*').eq('id', result.data.user.id).single();
+                if (profileResult.data) {
+                    var merged = {
+                        name:       profileResult.data.name        || '',
+                        city:       profileResult.data.city        || '',
+                        age:        profileResult.data.age != null ? String(profileResult.data.age) : '',
+                        bio:        profileResult.data.bio         || '',
+                        gender:     profileResult.data.gender      || '',
+                        skillLevel: profileResult.data.skill_level || '',
+                        vibe:       profileResult.data.vibe        || '',
+                        sports:     Array.isArray(profileResult.data.sports) ? profileResult.data.sports : [],
+                        avatar:     profileResult.data.avatar      || '🏃',
+                        usingPhoto: false,
+                        photo:      null
+                    };
+                    var local = PlaydateStorage.getUser();
+                    if (local && local.usingPhoto && local.photo) {
+                        merged.usingPhoto = true;
+                        merged.photo = local.photo;
+                    }
+                    PlaydateStorage.setUser(merged);
+                } else {
+                    // No Supabase row — user signed up during email confirmation flow.
+                    // If localStorage has profile data, sync it up now.
+                    var localProfile = PlaydateStorage.getUser();
+                    if (localProfile) {
+                        var syncOk = await upsertProfile(localProfile);
+                        if (!syncOk) {
+                            console.warn('[Playdate] Login: localStorage profile found but Supabase upsert failed — continuing with localStorage fallback.');
+                        }
+                    }
+                }
+
+                window.location.href = 'profile.html';
+            } catch (e) {
+                errEl.textContent = 'Unable to connect. Please check your connection and try again.';
+                errEl.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Log In';
+            }
+        }
+
+        document.getElementById('login-password').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') loginUser();
+        });
     </script>
+
+  <!-- ── Login modal ─────────────────────────────────────────────────── -->
+  <div id="login-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:24px;padding:36px 32px 28px;max-width:380px;width:calc(100% - 40px);box-shadow:0 20px 60px rgba(0,0,0,0.18);position:relative;">
+      <button onclick="closeLoginModal()" style="position:absolute;top:16px;right:18px;background:none;border:none;font-size:20px;color:#bbb;cursor:pointer;line-height:1;">✕</button>
+      <div style="font-family:'Fraunces',serif;font-weight:700;font-size:26px;color:#111;margin:0 0 6px;letter-spacing:-0.3px;">Welcome back</div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#999;margin:0 0 24px;">Log in to your Playdate account</div>
+      <div style="margin-bottom:14px;">
+        <label style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;color:#555;display:block;margin-bottom:6px;">Email</label>
+        <input id="login-email" type="email" placeholder="jane@email.com" style="width:100%;box-sizing:border-box;border:1.5px solid #e8e8e8;border-radius:12px;padding:11px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;outline:none;">
+      </div>
+      <div style="margin-bottom:18px;">
+        <label style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;color:#555;display:block;margin-bottom:6px;">Password</label>
+        <input id="login-password" type="password" placeholder="••••••••" style="width:100%;box-sizing:border-box;border:1.5px solid #e8e8e8;border-radius:12px;padding:11px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;outline:none;" autocomplete="current-password">
+      </div>
+      <div id="login-error" style="display:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#c0392b;background:#fff0f0;border:1.5px solid #f5c6cb;border-radius:10px;padding:10px 14px;margin-bottom:14px;"></div>
+      <button id="login-btn" onclick="loginUser()" style="width:100%;background:#F7567C;color:white;border:none;border-radius:22px;padding:14px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 6px 20px rgba(247,86,124,0.35);transition:background 0.15s ease;">Log In</button>
+    </div>
+  </div>
 </body>
 </html>
