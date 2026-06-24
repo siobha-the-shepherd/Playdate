@@ -676,7 +676,35 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const athletes = [];
+    let athletes = [];
+    var currentUserId = null;
+
+    async function loadAthletes() {
+      try {
+        var sessionResult = await sb.auth.getSession();
+        var loaderUserId = sessionResult.data && sessionResult.data.session
+          ? sessionResult.data.session.user.id
+          : null;
+        var res = await sb.from('Profiles').select('*');
+        if (res.error || !Array.isArray(res.data)) return;
+        athletes = res.data
+          .filter(function(row) { return row.id !== loaderUserId; })
+          .map(function(row) {
+            // Placeholder coords — random offset near the user's resolved location until profiles store real per-athlete geolocation
+            var lat = userLat + (Math.random() - 0.5) * 0.2;
+            var lng = userLng + (Math.random() - 0.5) * 0.2;
+            return {
+              id:    row.id,
+              name:  typeof row.name === 'string' ? row.name : 'Unknown',
+              sport: Array.isArray(row.sports) && row.sports.length > 0 ? row.sports[0] : '',
+              skill: typeof row.skill_level === 'string' ? row.skill_level : '',
+              lat:   lat,
+              lng:   lng
+            };
+          });
+        renderMarkers();
+      } catch (e) {}
+    }
 
     const sportColors = {
       Tennis: "#F7567C",
@@ -754,7 +782,7 @@
               <div class="pcard-body">
                 <span class="pcard-vibe">${a.skill}</span>
                 <div class="pcard-dist">📍 ${dist.toFixed(1)} mi away</div>
-                <button class="popup-btn" onclick="requestPlaydate(${JSON.stringify(a.name)}, ${JSON.stringify(a.sport)})">Schedule a Playdate</button>
+                <button class="popup-btn" onclick="requestPlaydate(${JSON.stringify(a.id)}, ${JSON.stringify(a.name)}, ${JSON.stringify(a.sport)})">Schedule a Playdate</button>
               </div>
             `, { className: 'custom-popup', maxWidth: 240 });
           markers.push(marker);
@@ -811,25 +839,42 @@
 
     function _startGeolocation() {
       if (navigator.geolocation) {
+        var resolved = false;
+
+        function _onFallback() {
+          if (resolved) return;
+          resolved = true;
+          // Geolocation denied or timed out — only show blue dot for anonymous (no-profile) users
+          if (!profileUser) placeUserMarker();
+          renderMarkers();
+          loadAthletes();
+        }
+
+        var geoTimeout = setTimeout(_onFallback, 5000);
+
         navigator.geolocation.getCurrentPosition(
           function(pos) {
+            if (resolved) return;
+            resolved = true;
+            clearTimeout(geoTimeout);
             userLat = pos.coords.latitude;
             userLng = pos.coords.longitude;
             map.setView([userLat, userLng], 13);
             document.getElementById('location-banner').style.display = 'block';
             placeUserMarker();
             renderMarkers();
+            loadAthletes();
           },
           function() {
-            // Geolocation denied — only show blue dot for anonymous (no-profile) users
-            if (!profileUser) placeUserMarker();
-            renderMarkers();
+            clearTimeout(geoTimeout);
+            _onFallback();
           }
         );
       } else {
         // No geolocation API — same as denied
         if (!profileUser) placeUserMarker();
         renderMarkers();
+        loadAthletes();
       }
     }
 
@@ -837,6 +882,11 @@
     // marker is placed instead of the anonymous blue dot when localStorage is empty.
     getProfileWithFallback().then(function(p) {
       if (p) profileUser = p;
+      return sb.auth.getSession();
+    }).then(function(result) {
+      if (result && result.data && result.data.session) {
+        currentUserId = result.data.session.user.id;
+      }
       _startGeolocation();
     }).catch(function() {
       _startGeolocation();
@@ -887,7 +937,7 @@
     updateFilterBadge();
 
     /* ── Playdate modal ──────────────────────────────────────────────── */
-    function requestPlaydate(name, sport) {
+    async function requestPlaydate(athleteId, name, sport) {
       const today = new Date().toISOString();
       if (!PlaydateStorage.addRequest({ name: name, sport: sport, date: today, status: 'pending' })) {
         alert("Couldn't save your request — your browser storage may be full. Please try again.");
@@ -896,6 +946,23 @@
       document.getElementById('modal-athlete-name').textContent = name;
       document.getElementById('playdate-modal').classList.add('visible');
       map.closePopup();
+
+      if (currentUserId && athleteId) {
+        try {
+          var result = await sb.from('Requests').insert({
+            sender_id:    currentUserId,
+            recipient_id: athleteId,
+            athlete_name: name,
+            sport:        sport,
+            status:       'pending'
+          });
+          if (result.error) {
+            console.error('[Playdate] Supabase request insert failed:', result.error);
+          }
+        } catch (e) {
+          console.error('[Playdate] Supabase request insert threw:', e);
+        }
+      }
     }
 
     function closeModal() {

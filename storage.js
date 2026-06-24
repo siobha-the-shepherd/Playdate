@@ -54,11 +54,12 @@ var PlaydateStorage = (function () {
      * Serialize and persist a profile object.
      * Returns true on success, false on any failure (including quota exceeded).
      */
-    function setUser(data) {
+    function setUser(data, onError) {
         try {
             localStorage.setItem(USER_KEY, JSON.stringify(data));
             return true;
         } catch (e) {
+            if (typeof onError === 'function') onError(e);
             return false;
         }
     }
@@ -123,6 +124,7 @@ var PlaydateStorage = (function () {
 
     function clearUser() {
         localStorage.removeItem(USER_KEY);
+        localStorage.removeItem('playdatePendingSync');
     }
 
     // ── Public API ─────────────────────────────────────────────────────────

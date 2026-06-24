@@ -307,10 +307,63 @@
   <div class="requests-list" id="requests-list"></div>
 
   <script>
-    function updateStatus(index, status) {
+    var currentUserId = null;
+    var usingSupabase = false;
+
+    async function initCurrentUser() {
+      try {
+        var result = await sb.auth.getSession();
+        var session = result.data && result.data.session;
+        currentUserId = session ? session.user.id : null;
+      } catch (e) {
+        currentUserId = null;
+      }
+    }
+
+    function _safeString(value, fallback) {
+      return typeof value === 'string' ? value : fallback;
+    }
+
+    async function fetchRequests() {
+      if (currentUserId) {
+        try {
+          var result = await sb.from('Requests')
+            .select('*')
+            .eq('recipient_id', currentUserId)
+            .eq('hidden_by_recipient', false)
+            .order('requested_at', { ascending: false });
+          if (!result.error && Array.isArray(result.data)) {
+            usingSupabase = true;
+            return {
+              source: 'supabase',
+              data: result.data.map(function(row) {
+                return {
+                  id:     row.id,
+                  name:   _safeString(row.athlete_name, 'Unknown'),
+                  sport:  _safeString(row.sport, 'Unknown'),
+                  date:   row.requested_at,
+                  status: row.status
+                };
+              })
+            };
+          }
+        } catch (e) { /* fall through to localStorage */ }
+      }
+      usingSupabase = false;
+      return { source: 'local', data: PlaydateStorage.getRequests() };
+    }
+
+    async function updateStatus(requestId, status) {
+      if (usingSupabase) {
+        try {
+          await sb.from('Requests').update({ status: status }).eq('id', requestId);
+        } catch (e) {}
+        render();
+        return;
+      }
       var requests = PlaydateStorage.getRequests();
-      if (requests[index]) {
-        requests[index].status = status;
+      if (requests[requestId]) {
+        requests[requestId].status = status;
         PlaydateStorage.setRequests(requests);
         render();
       }
@@ -333,7 +386,20 @@
       return months[d.getMonth()] + ' ' + d.getDate() + ' at ' + hours + ':' + minStr + ' ' + ampm;
     }
 
-    function clearCompleted() {
+    async function clearCompleted() {
+      var fetched = await fetchRequests();
+      if (fetched.source === 'supabase') {
+        var completed = fetched.data.filter(function (req) {
+          return req.status === 'accepted' || req.status === 'declined';
+        });
+        try {
+          await Promise.all(completed.map(function (req) {
+            return sb.from('Requests').update({ hidden_by_recipient: true }).eq('id', req.id);
+          }));
+        } catch (e) {}
+        render();
+        return;
+      }
       var remaining = PlaydateStorage.getRequests().filter(function (req) {
         return req.status !== 'accepted' && req.status !== 'declined';
       });
@@ -341,8 +407,8 @@
       render();
     }
 
-    function render() {
-      var requests = PlaydateStorage.getRequests();
+    async function render() {
+      var requests = (await fetchRequests()).data;
 
       const list = document.getElementById('requests-list');
       const empty = document.getElementById('empty-state');
@@ -378,10 +444,13 @@
                          : isDeclined ? '✗ Declined'
                          : 'Pending';
 
+        const requestId = req.id !== undefined ? req.id : i;
+        const idLiteral = JSON.stringify(requestId);
+
         const actionsHTML = (!isAccepted && !isDeclined)
           ? `<div class="request-actions">
-               <button class="btn-accept" onclick="updateStatus(${i}, 'accepted')">Accept</button>
-               <button class="btn-decline" onclick="updateStatus(${i}, 'declined')">Decline</button>
+               <button class="btn-accept" onclick="updateStatus(${idLiteral}, 'accepted')">Accept</button>
+               <button class="btn-decline" onclick="updateStatus(${idLiteral}, 'declined')">Decline</button>
              </div>`
           : '';
 
@@ -405,7 +474,10 @@
       });
     }
 
-    render();
+    (async function() {
+      await initCurrentUser();
+      render();
+    })();
   </script>
 </body>
 </html>

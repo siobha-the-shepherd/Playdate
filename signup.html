@@ -488,6 +488,13 @@
             <h1 class="form-heading" id="form-heading">Build Your Card</h1>
             <p class="form-subheading">Every legend starts as a rookie.</p>
 
+            <div id="google-signin-wrap" style="margin-bottom:22px;">
+                <button type="button" id="google-signin-btn" onclick="signInWithGoogle()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:white;color:#444;border:1.5px solid #e8e8e8;border-radius:30px;padding:13px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">
+                    Sign in with Google
+                </button>
+            </div>
+            <div id="google-signed-in-msg" style="display:none;margin-bottom:22px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:#00836e;background:#e6faf9;border:1.5px solid #00B2A9;border-radius:14px;padding:12px 16px;text-align:center;"></div>
+
             <div class="field">
                 <label>Full name</label>
                 <input type="text" id="input-name" placeholder="Jane Smith" oninput="updateCard()">
@@ -559,6 +566,7 @@
                     <img class="upload-preview" id="upload-preview" src="" alt="">
                 </div>
                 <input type="file" id="photo-upload" accept="image/*" onchange="handlePhotoUpload(event)">
+                <p id="photo-error" style="display:none;color:#FE5733;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;margin:8px 0 0;text-align:center;">Your photo is too large to save, even after compression. Please try a smaller image (under 1 MB).</p>
             </div>
 
             <div class="field">
@@ -771,6 +779,8 @@
         function handlePhotoUpload(event) {
             var file = event.target.files[0];
             if (!file) return;
+            var photoErrEl = document.getElementById('photo-error');
+            if (photoErrEl) photoErrEl.style.display = 'none';
             compressPhoto(file, function(src) {
                 document.getElementById('upload-placeholder').style.display = 'none';
                 document.getElementById('upload-preview').src = src;
@@ -853,7 +863,16 @@
         }
 
         function _saveLocally(userData) {
-            if (!PlaydateStorage.setUser(userData)) {
+            var quotaOnPhoto = false;
+            if (!PlaydateStorage.setUser(userData, function(e) {
+                if ((e.name === 'QuotaExceededError' || e.code === 22) && userData.usingPhoto) {
+                    quotaOnPhoto = true;
+                }
+            })) {
+                if (quotaOnPhoto) {
+                    var errEl = document.getElementById('photo-error');
+                    if (errEl) errEl.style.display = 'block';
+                }
                 showPhotoError();
                 usingPhoto = false;
                 userData.photo = null;
@@ -885,6 +904,41 @@
             if (el) el.style.display = 'none';
         }
 
+        async function signInWithGoogle() {
+            try {
+                var redirectTo = window.location.href.split('#')[0].split('?')[0];
+                await sb.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: { redirectTo: redirectTo }
+                });
+            } catch (e) {
+                console.warn('[Playdate] Google sign-in failed to start:', e);
+                _showAuthError('Google sign-in failed. Please try again or use email/password.');
+            }
+        }
+
+        // Detects any existing authenticated Supabase session — most commonly
+        // from a Google OAuth redirect, but not exclusively (e.g. a prior
+        // email/password session with no local profile yet would also match).
+        async function _checkExistingSession() {
+            try {
+                var result = await sb.auth.getSession();
+                var session = result.data && result.data.session;
+                if (!session) return;
+
+                var authFields = document.getElementById('auth-fields');
+                if (authFields) authFields.style.display = 'none';
+                var googleWrap = document.getElementById('google-signin-wrap');
+                if (googleWrap) googleWrap.style.display = 'none';
+                var msgEl = document.getElementById('google-signed-in-msg');
+                if (msgEl) {
+                    msgEl.textContent = 'Signed in as ' + (session.user.email || '') + ' ✓';
+                    msgEl.style.display = 'block';
+                }
+            } catch (e) {}
+        }
+        _checkExistingSession();
+
         async function saveAndRedirect() {
             const name = document.getElementById('input-name').value.trim();
             if (!name) {
@@ -911,40 +965,60 @@
                         console.warn('[Playdate] Edit: upsertProfile failed — profile saved to localStorage only.');
                     }
                 } else {
-                    // New signup: create Supabase auth account first
-                    const email = document.getElementById('input-email').value.trim();
-                    const password = document.getElementById('input-password').value;
+                    // New signup: either an authenticated session already exists
+                    // (most commonly from Google sign-in), or this is the
+                    // email/password case
+                    var existingSessionResult = await sb.auth.getSession();
+                    var existingSession = existingSessionResult.data && existingSessionResult.data.session;
 
-                    if (!email) {
-                        _showAuthError('Please enter your email address.');
-                        document.getElementById('input-email').focus();
-                        return;
-                    }
-                    if (!password) {
-                        _showAuthError('Please enter a password.');
-                        document.getElementById('input-password').focus();
-                        return;
-                    }
+                    if (existingSession) {
+                        // Already authenticated — skip signUp, just save the profile
+                        if (!_saveLocally(userData)) {
+                            alert('Unable to save your profile. Your browser storage may be full.');
+                            return;
+                        }
+                        var sessionUpsertOk = await upsertProfile(userData);
+                        if (!sessionUpsertOk) {
+                            console.warn('[Playdate] Signup (existing session): upsertProfile failed — profile saved to localStorage only.');
+                        }
+                    } else {
+                        // Create Supabase auth account first
+                        const email = document.getElementById('input-email').value.trim();
+                        const password = document.getElementById('input-password').value;
 
-                    var signUpResult = await sb.auth.signUp({ email: email, password: password });
-                    if (signUpResult.error) {
-                        _showAuthError(authErrorMessage(signUpResult.error));
-                        return;
-                    }
+                        if (!email) {
+                            _showAuthError('Please enter your email address.');
+                            document.getElementById('input-email').focus();
+                            return;
+                        }
+                        if (!password) {
+                            _showAuthError('Please enter a password.');
+                            document.getElementById('input-password').focus();
+                            return;
+                        }
 
-                    // Save to localStorage so the app works regardless of Supabase state
-                    if (!_saveLocally(userData)) {
-                        alert('Unable to save your profile. Your browser storage may be full.');
-                        return;
-                    }
+                        var signUpResult = await sb.auth.signUp({ email: email, password: password });
+                        if (signUpResult.error) {
+                            _showAuthError(authErrorMessage(signUpResult.error));
+                            return;
+                        }
 
-                    // If a session is active immediately (email confirmation disabled),
-                    // write the profile row now. If session is null (confirmation pending),
-                    // localStorage data is valid — the row will sync after the user confirms.
-                    if (signUpResult.data && signUpResult.data.session) {
-                        var signUpOk = await upsertProfile(userData);
-                        if (!signUpOk) {
-                            console.warn('[Playdate] Signup: upsertProfile failed — profile saved to localStorage only.');
+                        // Save to localStorage so the app works regardless of Supabase state
+                        if (!_saveLocally(userData)) {
+                            alert('Unable to save your profile. Your browser storage may be full.');
+                            return;
+                        }
+
+                        // If a session is active immediately (email confirmation disabled),
+                        // write the profile row now. If session is null (confirmation pending),
+                        // localStorage data is valid — the row will sync after the user confirms.
+                        if (signUpResult.data && signUpResult.data.session) {
+                            var signUpOk = await upsertProfile(userData);
+                            if (!signUpOk) {
+                                console.warn('[Playdate] Signup: upsertProfile failed — profile saved to localStorage only.');
+                            }
+                        } else {
+                            localStorage.setItem('playdatePendingSync', 'true');
                         }
                     }
                 }
@@ -1067,7 +1141,7 @@
                 }
 
                 // Load profile from Supabase and merge with local photo
-                var profileResult = await sb.from('profiles').select('*').eq('id', result.data.user.id).single();
+                var profileResult = await sb.from('Profiles').select('*').eq('id', result.data.user.id).single();
                 if (profileResult.data) {
                     var merged = {
                         name:       profileResult.data.name        || '',

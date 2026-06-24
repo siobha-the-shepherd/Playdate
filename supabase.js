@@ -106,7 +106,7 @@ async function getProfileWithFallback() {
         var result = await sb.auth.getSession();
         var session = result.data && result.data.session;
         if (session) {
-            var profileResult = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+            var profileResult = await sb.from('Profiles').select('*').eq('id', session.user.id).single();
             if (profileResult.data) {
                 var merged = _mapSupabaseProfile(profileResult.data);
                 PlaydateStorage.setUser(merged);
@@ -127,7 +127,7 @@ async function upsertProfile(userData) {
         var result = await sb.auth.getSession();
         var session = result.data && result.data.session;
         if (!session) return false;
-        var upsertResult = await sb.from('profiles').upsert(_mapToSupabaseRow(userData, session.user.id));
+        var upsertResult = await sb.from('Profiles').upsert(_mapToSupabaseRow(userData, session.user.id));
         if (upsertResult.error) {
             console.error('[Playdate] upsertProfile failed:', upsertResult.error);
             return false;
@@ -143,16 +143,25 @@ async function upsertProfile(userData) {
  * Non-blocking background sync: pull latest profile from Supabase
  * and update localStorage without blocking page render.
  */
-function syncSessionBackground() {
-    sb.auth.getSession().then(function(result) {
+async function syncSessionBackground() {
+    try {
+        var result = await sb.auth.getSession();
         var session = result.data && result.data.session;
         if (!session) return;
-        sb.from('profiles').select('*').eq('id', session.user.id).single().then(function(profileResult) {
-            if (!profileResult.data) return;
-            var merged = _mapSupabaseProfile(profileResult.data);
-            PlaydateStorage.setUser(merged);
-        });
-    }).catch(function() {});
+        if (localStorage.getItem('playdatePendingSync')) {
+            var pending = PlaydateStorage.getUser();
+            if (pending) {
+                try {
+                    var ok = await upsertProfile(pending);
+                    if (ok) localStorage.removeItem('playdatePendingSync');
+                } catch (e) {}
+            }
+        }
+        var profileResult = await sb.from('Profiles').select('*').eq('id', session.user.id).single();
+        if (!profileResult.data) return;
+        var merged = _mapSupabaseProfile(profileResult.data);
+        PlaydateStorage.setUser(merged);
+    } catch (e) {}
 }
 
 /**
